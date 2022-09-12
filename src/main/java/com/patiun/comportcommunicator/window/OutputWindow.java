@@ -9,16 +9,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
 
-import static com.patiun.comportcommunicator.constant.ConstantValues.BACKGROUND_COLOR;
-
 public class OutputWindow extends JFrame {
 
     private SerialPort outputPort;
 
     private JTextArea outputTextArea;
 
-    public OutputWindow() throws HeadlessException {
+    public OutputWindow(int outputPortIndex) throws HeadlessException {
         super();
+        setUpCommPort(outputPortIndex);
+        setUpMyself();
+        add(ComponentFactory.getInstance().buildLabel(outputPort.getDescriptivePortName() + " - Output"), BorderLayout.PAGE_START);
+        add(setUpOutput(), BorderLayout.CENTER);
+        launch();
     }
 
     private void setUpCommPort(int outputPortIndex) {
@@ -43,20 +46,17 @@ public class OutputWindow extends JFrame {
                     byte[] bytes = new byte[bytesAvailable];
                     int bytesRead = outputPort.readBytes(bytes, bytesAvailable);
                     DebugWindow.getInstance().sendMessage(getTitle(), "Bytes read: " + bytesRead);
+                    StatsWindow.getInstance().incrementBytesTransferred(outputPort.getDescriptivePortName(), bytesRead);
                     outputTextArea.append(new String(bytes));
+                    pack();
                 }
             }
         });
-        ControlWindow.getInstance().registerPort(outputPort);
     }
 
     private void setUpMyself() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-        setTitle(outputPort.getDescriptivePortName() + " - Output");
-        getContentPane().setBackground(BACKGROUND_COLOR);
-        setBackground(BACKGROUND_COLOR);
-        setUndecorated(false);
+        ComponentFactory.getInstance().setUpFrame(this, outputPort.getDescriptivePortName() + " - Output");
     }
 
     private JTextArea setUpOutput() {
@@ -67,13 +67,5 @@ public class OutputWindow extends JFrame {
     private void launch() {
         pack();
         setVisible(true);
-    }
-
-    public void setupAndLaunch(int outputPortIndex) {
-        setUpCommPort(outputPortIndex);
-        setUpMyself();
-        add(ComponentFactory.getInstance().buildLabel(outputPort.getDescriptivePortName() + " - Output"));
-        add(setUpOutput());
-        launch();
     }
 }

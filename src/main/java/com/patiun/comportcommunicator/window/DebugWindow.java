@@ -1,31 +1,26 @@
 package com.patiun.comportcommunicator.window;
 
+import com.patiun.comportcommunicator.factory.ComponentFactory;
+
 import javax.swing.*;
 import java.awt.*;
 
-import static com.patiun.comportcommunicator.constant.ConstantValues.BACKGROUND_COLOR;
-import static com.patiun.comportcommunicator.constant.ConstantValues.MAIN_COLOR;
-
 public class DebugWindow extends JFrame {
+
+    private static final String WINDOW_NAME = "Debug";
 
     private static final DebugWindow INSTANCE = new DebugWindow();
 
-    JTextArea textArea = new JTextArea();
+    JTextArea textArea;
 
     private DebugWindow() {
         super();
-        setTitle("Debug");
+        ComponentFactory.getInstance().setUpFrame(this, WINDOW_NAME);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        getContentPane().setBackground(BACKGROUND_COLOR);
-        setBackground(BACKGROUND_COLOR);
-        setUndecorated(false);
 
-        textArea.setBackground(BACKGROUND_COLOR);
-        textArea.setFont(new Font("Consolas", Font.BOLD, 20));
-        textArea.setForeground(MAIN_COLOR);
-        textArea.setMinimumSize(new Dimension(700, 400));
+        textArea = ComponentFactory.getInstance().buildTextArea(false);
 
-        add(textArea);
+        add(textArea, BorderLayout.CENTER);
 
         pack();
         setVisible(true);
@@ -37,5 +32,6 @@ public class DebugWindow extends JFrame {
 
     public void sendMessage(String windowTitle, String message) {
         textArea.append(windowTitle + ": " + message + "\n");
+        pack();
     }
 }
