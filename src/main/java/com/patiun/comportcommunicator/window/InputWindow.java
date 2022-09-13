@@ -23,7 +23,7 @@ public class InputWindow extends JFrame {
     }
 
     private void setUpCommPort(int inputPortIndex) {
-        DebugWindow.getInstance().sendMessage(getTitle(), Arrays.toString(SerialPort.getCommPorts()));
+        DebugWindow.getInstance().sendMessage(getTitle(), "Found the following ports: " + Arrays.toString(SerialPort.getCommPorts()));
 
         inputPort = SerialPort.getCommPorts()[inputPortIndex];
         inputPort.openPort();

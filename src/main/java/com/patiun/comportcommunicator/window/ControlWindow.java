@@ -36,7 +36,8 @@ public class ControlWindow extends JFrame {
         JSpinner spinner = ComponentFactory.getInstance().buildSpinner(new SpinnerNumberModel(INITIAL_DATA_BITS, MIN_DATA_BITS, MAX_DATA_BITS, DATA_BITS_STEP));
         spinner.addChangeListener(e -> {
             for (SerialPort serialPort : ports) {
-                serialPort.setNumDataBits((Integer) spinner.getValue());
+                boolean success = serialPort.setNumDataBits((Integer) spinner.getValue());
+                DebugWindow.getInstance().sendMessage(WINDOW_NAME, "Set data bits of " + serialPort.getDescriptivePortName() + " to " + spinner.getValue() + ": " + (success ? "success" : "failure"));
             }
         });
 
