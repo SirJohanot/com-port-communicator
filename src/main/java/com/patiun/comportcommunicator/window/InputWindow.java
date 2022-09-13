@@ -13,19 +13,19 @@ public class InputWindow extends JFrame {
 
     private SerialPort inputPort;
 
-    public InputWindow(int inputPortIndex) throws HeadlessException {
+    public InputWindow(String inputPortDescriptor) throws HeadlessException {
         super();
-        setUpCommPort(inputPortIndex);
+        setUpCommPort(inputPortDescriptor);
         setUpMyself();
         add(ComponentFactory.getInstance().buildLabel(inputPort.getDescriptivePortName() + " - Input"), BorderLayout.PAGE_START);
         add(setUpInput(), BorderLayout.CENTER);
         launch();
     }
 
-    private void setUpCommPort(int inputPortIndex) {
+    private void setUpCommPort(String inputPorDescriptor) {
         DebugWindow.getInstance().sendMessage(getTitle(), "Found the following ports: " + Arrays.toString(SerialPort.getCommPorts()));
 
-        inputPort = SerialPort.getCommPorts()[inputPortIndex];
+        inputPort = SerialPort.getCommPort(inputPorDescriptor);
         inputPort.openPort();
     }
 

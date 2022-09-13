@@ -1,13 +1,12 @@
 package com.patiun.comportcommunicator.window;
 
 import com.fazecast.jSerialComm.SerialPort;
-import com.patiun.comportcommunicator.config.PortIndices;
+import com.patiun.comportcommunicator.config.PortDescriptors;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ControlWindow extends JFrame {
@@ -31,7 +30,10 @@ public class ControlWindow extends JFrame {
 
         add(ComponentFactory.getInstance().buildLabel("Change ports data bits (5 - 8): "));
 
-        ports.addAll(Arrays.asList(SerialPort.getCommPorts()).subList(PortIndices.START_PORT_INDEX, PortIndices.END_PORT_INDEX));
+        for (String serialPortDescriptor : new String[]{PortDescriptors.FIRST_INPUT_PORT_DESCRIPTOR, PortDescriptors.SECOND_OUTPUT_PORT_DESCRIPTOR, PortDescriptors.SECOND_INPUT_PORT_DESCRIPTOR, PortDescriptors.FIRST_OUTPUT_PORT_DESCRIPTOR}) {
+            SerialPort serialPort = SerialPort.getCommPort(serialPortDescriptor);
+            ports.add(serialPort);
+        }
 
         JSpinner spinner = ComponentFactory.getInstance().buildSpinner(new SpinnerNumberModel(INITIAL_DATA_BITS, MIN_DATA_BITS, MAX_DATA_BITS, DATA_BITS_STEP));
         spinner.addChangeListener(e -> {

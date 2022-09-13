@@ -1,11 +1,10 @@
 package com.patiun.comportcommunicator.window;
 
 import com.fazecast.jSerialComm.SerialPort;
-import com.patiun.comportcommunicator.config.PortIndices;
+import com.patiun.comportcommunicator.config.PortDescriptors;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
 
 import javax.swing.*;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 public class StatsWindow extends JFrame {
@@ -23,7 +22,8 @@ public class StatsWindow extends JFrame {
         ComponentFactory.getInstance().setUpFrame(this, WINDOW_NAME);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
-        for (SerialPort serialPort : Arrays.copyOfRange(SerialPort.getCommPorts(), PortIndices.START_PORT_INDEX, PortIndices.END_PORT_INDEX)) {
+        for (String serialPortDescriptor : new String[]{PortDescriptors.FIRST_INPUT_PORT_DESCRIPTOR, PortDescriptors.SECOND_OUTPUT_PORT_DESCRIPTOR, PortDescriptors.SECOND_INPUT_PORT_DESCRIPTOR, PortDescriptors.FIRST_OUTPUT_PORT_DESCRIPTOR}) {
+            SerialPort serialPort = SerialPort.getCommPort(serialPortDescriptor);
             portNamesToBytes.put(serialPort.getDescriptivePortName(), 0);
         }
 

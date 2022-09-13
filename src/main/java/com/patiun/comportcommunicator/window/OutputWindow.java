@@ -15,19 +15,19 @@ public class OutputWindow extends JFrame {
 
     private JTextArea outputTextArea;
 
-    public OutputWindow(int outputPortIndex) throws HeadlessException {
+    public OutputWindow(String outputPortDescriptor) throws HeadlessException {
         super();
-        setUpCommPort(outputPortIndex);
+        setUpCommPort(outputPortDescriptor);
         setUpMyself();
         add(ComponentFactory.getInstance().buildLabel(outputPort.getDescriptivePortName() + " - Output"), BorderLayout.PAGE_START);
         add(setUpOutput(), BorderLayout.CENTER);
         launch();
     }
 
-    private void setUpCommPort(int outputPortIndex) {
+    private void setUpCommPort(String outputPortDescriptor) {
         DebugWindow.getInstance().sendMessage(getTitle(), "Found the following ports: " + Arrays.toString(SerialPort.getCommPorts()));
 
-        outputPort = SerialPort.getCommPorts()[outputPortIndex];
+        outputPort = SerialPort.getCommPort(outputPortDescriptor);
         outputPort.openPort();
         outputPort.addDataListener(new SerialPortDataListener() {
             @Override

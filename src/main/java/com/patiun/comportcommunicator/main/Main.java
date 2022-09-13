@@ -1,6 +1,7 @@
 package com.patiun.comportcommunicator.main;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.patiun.comportcommunicator.config.PortDescriptors;
 import com.patiun.comportcommunicator.window.ControlWindow;
 import com.patiun.comportcommunicator.window.InputWindow;
 import com.patiun.comportcommunicator.window.OutputWindow;
@@ -11,15 +12,15 @@ public class Main {
     public static void main(String[] args) {
         ControlWindow.getInstance();
         StatsWindow.getInstance();
-        SerialPort serialPort = SerialPort.getCommPorts()[4];
+        SerialPort serialPort = SerialPort.getCommPort(PortDescriptors.FIRST_INPUT_PORT_DESCRIPTOR);
         if (serialPort.openPort()) {
             serialPort.closePort();
-            new InputWindow(4);
-            new OutputWindow(7);
+            new InputWindow(PortDescriptors.FIRST_INPUT_PORT_DESCRIPTOR);
+            new OutputWindow(PortDescriptors.FIRST_OUTPUT_PORT_DESCRIPTOR);
         } else {
             serialPort.closePort();
-            new InputWindow(6);
-            new OutputWindow(5);
+            new InputWindow(PortDescriptors.SECOND_INPUT_PORT_DESCRIPTOR);
+            new OutputWindow(PortDescriptors.SECOND_OUTPUT_PORT_DESCRIPTOR);
         }
     }
 }
