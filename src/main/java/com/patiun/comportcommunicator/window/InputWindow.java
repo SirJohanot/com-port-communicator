@@ -16,6 +16,7 @@ public class InputWindow extends JFrame {
     public InputWindow(String inputPortDescriptor) throws HeadlessException {
         super();
         setUpCommPort(inputPortDescriptor);
+        ControlWindow.getInstance().registerPort(inputPort);
         setUpMyself();
         add(ComponentFactory.getInstance().buildLabel(inputPort.getDescriptivePortName() + " - Input"), BorderLayout.PAGE_START);
         add(setUpInput(), BorderLayout.CENTER);
@@ -40,7 +41,9 @@ public class InputWindow extends JFrame {
             @Override
             public void keyTyped(KeyEvent e) {
                 char keyChar = e.getKeyChar();
+                DebugWindow.getInstance().sendMessage(getTitle(), "Sending " + keyChar + " as " + inputPort.getNumDataBits() + " bits");
                 int bytesWritten = inputPort.writeBytes(new byte[]{(byte) keyChar}, 1);
+                DebugWindow.getInstance().sendMessage(getTitle(), "Sent " + bytesWritten + " bytes");
                 StatsWindow.getInstance().incrementBytesTransferred(inputPort.getDescriptivePortName(), bytesWritten);
                 pack();
             }

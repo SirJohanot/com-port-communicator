@@ -18,6 +18,7 @@ public class OutputWindow extends JFrame {
     public OutputWindow(String outputPortDescriptor) throws HeadlessException {
         super();
         setUpCommPort(outputPortDescriptor);
+        ControlWindow.getInstance().registerPort(outputPort);
         setUpMyself();
         add(ComponentFactory.getInstance().buildLabel(outputPort.getDescriptivePortName() + " - Output"), BorderLayout.PAGE_START);
         add(setUpOutput(), BorderLayout.CENTER);
@@ -45,7 +46,7 @@ public class OutputWindow extends JFrame {
                     DebugWindow.getInstance().sendMessage(getTitle(), "Bytes available to read: " + bytesAvailable);
                     byte[] bytes = new byte[bytesAvailable];
                     int bytesRead = outputPort.readBytes(bytes, bytesAvailable);
-                    DebugWindow.getInstance().sendMessage(getTitle(), "Bytes read: " + bytesRead);
+                    DebugWindow.getInstance().sendMessage(getTitle(), "Read message '" + new String(bytes) + "' as " + bytesRead + " bytes");
                     StatsWindow.getInstance().incrementBytesTransferred(outputPort.getDescriptivePortName(), bytesRead);
                     outputTextArea.append(new String(bytes));
                     pack();
