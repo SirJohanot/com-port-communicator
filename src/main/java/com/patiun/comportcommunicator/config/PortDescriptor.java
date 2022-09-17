@@ -1,6 +1,6 @@
 package com.patiun.comportcommunicator.config;
 
-public interface PortDescriptors {
+public interface PortDescriptor {
 
     String FIRST_INPUT_PORT_DESCRIPTOR = "COM1";
     String FIRST_OUTPUT_PORT_DESCRIPTOR = "COM2";

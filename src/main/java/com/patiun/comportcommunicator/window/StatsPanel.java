@@ -1,39 +1,37 @@
 package com.patiun.comportcommunicator.window;
 
 import com.fazecast.jSerialComm.SerialPort;
-import com.patiun.comportcommunicator.config.PortDescriptors;
+import com.patiun.comportcommunicator.config.PortDescriptor;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.LinkedHashMap;
 
-public class StatsWindow extends JFrame {
+public class StatsPanel extends JPanel {
 
-    private static final String WINDOW_NAME = "Stats";
-
-    private static final StatsWindow INSTANCE = new StatsWindow();
+    private static final StatsPanel INSTANCE = new StatsPanel();
 
     private final LinkedHashMap<String, Integer> portNamesToBytes = new LinkedHashMap<>();
 
     private final JTextArea textArea;
 
-    public StatsWindow() {
+    private StatsPanel() {
         super();
-        ComponentFactory.getInstance().setUpFrame(this, WINDOW_NAME);
-        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        ComponentFactory.getInstance().setUpPanel(this);
+        setLayout(new BorderLayout());
 
-        for (String serialPortDescriptor : new String[]{PortDescriptors.FIRST_INPUT_PORT_DESCRIPTOR, PortDescriptors.SECOND_OUTPUT_PORT_DESCRIPTOR, PortDescriptors.SECOND_INPUT_PORT_DESCRIPTOR, PortDescriptors.FIRST_OUTPUT_PORT_DESCRIPTOR}) {
+        for (String serialPortDescriptor : new String[]{PortDescriptor.FIRST_INPUT_PORT_DESCRIPTOR, PortDescriptor.SECOND_OUTPUT_PORT_DESCRIPTOR, PortDescriptor.SECOND_INPUT_PORT_DESCRIPTOR, PortDescriptor.FIRST_OUTPUT_PORT_DESCRIPTOR}) {
             SerialPort serialPort = SerialPort.getCommPort(serialPortDescriptor);
-            portNamesToBytes.put(serialPort.getDescriptivePortName(), 0);
+            portNamesToBytes.put(serialPort.getSystemPortName(), 0);
         }
+
+        add(ComponentFactory.getInstance().buildLabel("Stats"), BorderLayout.PAGE_START);
 
         textArea = ComponentFactory.getInstance().buildTextArea(false);
         updateTextArea();
 
-        add(textArea);
-
-        pack();
-        setVisible(true);
+        add(textArea, BorderLayout.CENTER);
     }
 
     public void incrementBytesTransferred(String portName, int value) {
@@ -57,10 +55,9 @@ public class StatsWindow extends JFrame {
             outputPort = !outputPort;
         }
         textArea.setText(newText.toString());
-        pack();
     }
 
-    public static StatsWindow getInstance() {
+    public static StatsPanel getInstance() {
         return INSTANCE;
     }
 
