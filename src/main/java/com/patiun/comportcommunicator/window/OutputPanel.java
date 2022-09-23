@@ -49,7 +49,6 @@ public class OutputPanel extends JPanel {
                     byte[] bytes = new byte[bytesAvailable];
                     int bytesRead = outputPort.readBytes(bytes, bytesAvailable);
                     DebugPanel.getInstance().sendMessage(name.getText(), "Read message '" + new String(bytes) + "' as " + bytesRead + " bytes");
-                    StatsPanel.getInstance().incrementBytesTransferred(outputPort.getSystemPortName(), bytesRead);
                     outputTextArea.append(new String(bytes));
                 }
             }

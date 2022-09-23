@@ -13,16 +13,19 @@ import java.util.regex.Pattern;
 public class InputPanel extends JPanel {
 
     private final SerialPort inputPort;
+    private final StatsPanel statsPanel;
 
     private final JLabel name;
 
-    public InputPanel(SerialPort inputPort) throws HeadlessException {
+    public InputPanel(SerialPort inputPort, StatsPanel statsPanel) throws HeadlessException {
         super();
         ComponentFactory.getInstance().setUpPanel(this);
         setLayout(new BorderLayout());
 
         this.inputPort = inputPort;
         ControlPanel.getInstance().registerPort(inputPort);
+
+        this.statsPanel = statsPanel;
 
         name = ComponentFactory.getInstance().buildLabel(inputPort.getSystemPortName() + " - Input");
         add(name, BorderLayout.PAGE_START);
@@ -45,7 +48,7 @@ public class InputPanel extends JPanel {
                 DebugPanel.getInstance().sendMessage(name.getText(), "Sending " + keyChar + " in " + inputPort.getNumDataBits() + " data bits");
                 int bytesWritten = inputPort.writeBytes(new byte[]{(byte) keyChar}, 1);
                 DebugPanel.getInstance().sendMessage(name.getText(), "Sent " + bytesWritten + " bytes");
-                StatsPanel.getInstance().incrementBytesTransferred(inputPort.getSystemPortName(), bytesWritten);
+                statsPanel.incrementBytesTransferred(inputPort.getSystemPortName(), bytesWritten);
             }
         });
 
