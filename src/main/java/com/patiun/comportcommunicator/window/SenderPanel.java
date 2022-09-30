@@ -1,7 +1,6 @@
 package com.patiun.comportcommunicator.window;
 
 import com.fazecast.jSerialComm.SerialPort;
-import com.patiun.comportcommunicator.config.AcceptedCharactersRegex;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
 
 import javax.swing.*;
@@ -10,14 +9,16 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.regex.Pattern;
 
-public class InputPanel extends JPanel {
+public class SenderPanel extends JPanel {
+
+    private static final String ACCEPTED_CHARACTERS_REGEX = "[ -~]";
 
     private final SerialPort inputPort;
     private final StatsPanel statsPanel;
 
     private final JLabel name;
 
-    public InputPanel(SerialPort inputPort, StatsPanel statsPanel) throws HeadlessException {
+    public SenderPanel(SerialPort inputPort, StatsPanel statsPanel) throws HeadlessException {
         super();
         ComponentFactory.getInstance().setUpPanel(this);
         setLayout(new BorderLayout());
@@ -27,7 +28,7 @@ public class InputPanel extends JPanel {
 
         this.statsPanel = statsPanel;
 
-        name = ComponentFactory.getInstance().buildLabel(inputPort.getSystemPortName() + " - Input");
+        name = ComponentFactory.getInstance().buildLabel(inputPort.getSystemPortName() + " - Sender");
         add(name, BorderLayout.PAGE_START);
 
         add(setUpInput(), BorderLayout.CENTER);
@@ -36,10 +37,20 @@ public class InputPanel extends JPanel {
     private JScrollPane setUpInput() {
         JTextArea inputTextArea = ComponentFactory.getInstance().buildTextArea(true);
         inputTextArea.getInputMap().put(KeyStroke.getKeyStroke("control V"), "none");
+        inputTextArea.getInputMap().put(KeyStroke.getKeyStroke("control Z"), "none");
+        inputTextArea.getInputMap().put(KeyStroke.getKeyStroke("control X"), "none");
         inputTextArea.addKeyListener(new KeyAdapter() {
             @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyChar() == KeyEvent.VK_BACK_SPACE || e.getKeyChar() == KeyEvent.VK_DELETE) {
+                    e.consume();
+                    return;
+                }
+            }
+
+            @Override
             public void keyTyped(KeyEvent e) {
-                if (!Pattern.matches(AcceptedCharactersRegex.REGEX, String.valueOf(e.getKeyChar()))) {
+                if (!Pattern.matches(ACCEPTED_CHARACTERS_REGEX, String.valueOf(e.getKeyChar()))) {
                     e.consume();
                     return;
                 }

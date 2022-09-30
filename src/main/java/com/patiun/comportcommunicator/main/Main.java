@@ -21,8 +21,6 @@ public class Main {
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setLayout(new BorderLayout());
 
-        window.add(ControlPanel.getInstance(), BorderLayout.PAGE_START);
-
         try {
             topologyCheck();
 
@@ -48,11 +46,13 @@ public class Main {
             SerialPort outputSerialPort = SerialPort.getCommPort(outputDescriptor);
             outputSerialPort.openPort();
 
+            window.add(ControlPanel.getInstance(), BorderLayout.PAGE_START);
+            
             StatsPanel statsPanel = new StatsPanel(inputSerialPort.getSystemPortName());
             window.add(statsPanel, BorderLayout.CENTER);
 
-            window.add(new InputPanel(inputSerialPort, statsPanel), BorderLayout.WEST);
-            window.add(new OutputPanel(outputSerialPort), BorderLayout.EAST);
+            window.add(new SenderPanel(inputSerialPort, statsPanel), BorderLayout.WEST);
+            window.add(new ReceiverPanel(outputSerialPort), BorderLayout.EAST);
 
         } catch (NoPortFoundException e) {
             DebugPanel.getInstance().sendMessage("System", e.getMessage());

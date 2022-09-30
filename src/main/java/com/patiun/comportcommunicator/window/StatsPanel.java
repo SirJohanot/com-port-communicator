@@ -42,7 +42,7 @@ public class StatsPanel extends JPanel {
         for (String portName : portNamesToBytes.keySet()) {
             newText.append(portName);
 //            if (outputPort) {
-            newText.append(" - Bytes transferred: ").append(portNamesToBytes.get(portName) + previousBytes).append("\n");
+            newText.append(" - Bytes sent: ").append(portNamesToBytes.get(portName) + previousBytes).append("\n");
 //            } else {
 //                newText.append(" -> ");
 //                previousBytes = portNamesToBytes.get(portName);

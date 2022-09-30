@@ -8,14 +8,14 @@ import com.patiun.comportcommunicator.factory.ComponentFactory;
 import javax.swing.*;
 import java.awt.*;
 
-public class OutputPanel extends JPanel {
+public class ReceiverPanel extends JPanel {
 
     private final SerialPort outputPort;
 
     private final JLabel name;
     private final JTextArea outputTextArea;
 
-    public OutputPanel(SerialPort outputPort) throws HeadlessException {
+    public ReceiverPanel(SerialPort outputPort) throws HeadlessException {
         super();
         ComponentFactory.getInstance().setUpPanel(this);
         setLayout(new BorderLayout());
@@ -24,7 +24,7 @@ public class OutputPanel extends JPanel {
         setUpDataListener();
         ControlPanel.getInstance().registerPort(outputPort);
 
-        name = ComponentFactory.getInstance().buildLabel(outputPort.getSystemPortName() + " - Output");
+        name = ComponentFactory.getInstance().buildLabel(outputPort.getSystemPortName() + " - Receiver");
         add(name, BorderLayout.PAGE_START);
 
         outputTextArea = ComponentFactory.getInstance().buildTextArea(false);
