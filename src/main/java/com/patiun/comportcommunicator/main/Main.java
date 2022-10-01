@@ -3,6 +3,7 @@ package com.patiun.comportcommunicator.main;
 import com.fazecast.jSerialComm.SerialPort;
 import com.patiun.comportcommunicator.exception.NoPortFoundException;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
+import com.patiun.comportcommunicator.util.StuffedBytesHighlighter;
 import com.patiun.comportcommunicator.window.*;
 
 import javax.swing.*;
@@ -38,7 +39,7 @@ public class Main {
                 outputDescriptor = SECOND_OUTPUT_PORT_DESCRIPTOR;
             }
 
-            ComponentFactory.getInstance().setUpFrame(window, inputDescriptor + ", " + outputDescriptor + " - COM Port Communicator");
+            ComponentFactory.setUpFrame(window, inputDescriptor + ", " + outputDescriptor + " - COM Port Communicator");
 
             SerialPort inputSerialPort = SerialPort.getCommPort(inputDescriptor);
             inputSerialPort.openPort();
@@ -47,8 +48,8 @@ public class Main {
             outputSerialPort.openPort();
 
             window.add(ControlPanel.getInstance(), BorderLayout.PAGE_START);
-            
-            StatsPanel statsPanel = new StatsPanel(inputSerialPort.getSystemPortName());
+
+            StatsPanel statsPanel = new StatsPanel(new StuffedBytesHighlighter());
             window.add(statsPanel, BorderLayout.CENTER);
 
             window.add(new SenderPanel(inputSerialPort, statsPanel), BorderLayout.WEST);

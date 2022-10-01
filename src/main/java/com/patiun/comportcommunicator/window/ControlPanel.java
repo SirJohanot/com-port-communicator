@@ -21,12 +21,12 @@ public class ControlPanel extends JPanel {
 
     private ControlPanel() {
         super();
-        ComponentFactory.getInstance().setUpPanel(this);
+        ComponentFactory.setUpPanel(this);
         setLayout(new FlowLayout());
 
-        add(ComponentFactory.getInstance().buildLabel("Change ports data bits (5 - 8): "));
+        add(ComponentFactory.buildLabel("Change ports data bits (5 - 8): "));
 
-        JSpinner spinner = ComponentFactory.getInstance().buildSpinner(new SpinnerNumberModel(INITIAL_DATA_BITS, MIN_DATA_BITS, MAX_DATA_BITS, DATA_BITS_STEP));
+        JSpinner spinner = ComponentFactory.buildSpinner(new SpinnerNumberModel(INITIAL_DATA_BITS, MIN_DATA_BITS, MAX_DATA_BITS, DATA_BITS_STEP));
         spinner.addChangeListener(e -> {
             for (SerialPort serialPort : ports) {
                 serialPort.closePort();

@@ -13,13 +13,13 @@ public class DebugPanel extends JPanel {
 
     private DebugPanel() {
         super();
-        ComponentFactory.getInstance().setUpPanel(this);
+        ComponentFactory.setUpPanel(this);
         setLayout(new BorderLayout());
 
-        add(ComponentFactory.getInstance().buildLabel("Debug"), BorderLayout.PAGE_START);
+        add(ComponentFactory.buildLabel("Debug"), BorderLayout.PAGE_START);
 
-        textArea = ComponentFactory.getInstance().buildTextArea(false);
-        add(ComponentFactory.getInstance().buildScrollPane(textArea), BorderLayout.CENTER);
+        textArea = ComponentFactory.buildTextArea(false);
+        add(ComponentFactory.buildScrollPane(textArea), BorderLayout.CENTER);
     }
 
     public void sendMessage(String windowTitle, String message) {

@@ -3,10 +3,14 @@ package com.patiun.comportcommunicator.window;
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
+import com.patiun.comportcommunicator.bytestuffing.ByteStuffer;
+import com.patiun.comportcommunicator.entity.Packet;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
+import com.patiun.comportcommunicator.util.ByteListCaster;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class ReceiverPanel extends JPanel {
 
@@ -17,18 +21,18 @@ public class ReceiverPanel extends JPanel {
 
     public ReceiverPanel(SerialPort outputPort) throws HeadlessException {
         super();
-        ComponentFactory.getInstance().setUpPanel(this);
+        ComponentFactory.setUpPanel(this);
         setLayout(new BorderLayout());
 
         this.outputPort = outputPort;
         setUpDataListener();
         ControlPanel.getInstance().registerPort(outputPort);
 
-        name = ComponentFactory.getInstance().buildLabel(outputPort.getSystemPortName() + " - Receiver");
+        name = ComponentFactory.buildLabel(outputPort.getSystemPortName() + " - Receiver");
         add(name, BorderLayout.PAGE_START);
 
-        outputTextArea = ComponentFactory.getInstance().buildTextArea(false);
-        add(ComponentFactory.getInstance().buildScrollPane(outputTextArea), BorderLayout.CENTER);
+        outputTextArea = ComponentFactory.buildTextArea(false);
+        add(ComponentFactory.buildScrollPane(outputTextArea), BorderLayout.CENTER);
     }
 
     private void setUpDataListener() {
@@ -49,7 +53,11 @@ public class ReceiverPanel extends JPanel {
                     byte[] bytes = new byte[bytesAvailable];
                     int bytesRead = outputPort.readBytes(bytes, bytesAvailable);
                     DebugPanel.getInstance().sendMessage(name.getText(), "Read message '" + new String(bytes) + "' as " + bytesRead + " bytes");
-                    outputTextArea.append(new String(bytes));
+                    Packet receivedPacket = new Packet(bytes);
+                    List<Byte> dataBytes = receivedPacket.getData();
+                    List<Byte> emptiedBytes = ByteStuffer.emptyBytes(dataBytes, Packet.ESCAPE_BYTE);
+                    byte[] emptiedBytesPrimitiveArray = ByteListCaster.byteListToPrimitiveArray(emptiedBytes);
+                    outputTextArea.append(new String(emptiedBytesPrimitiveArray) + "\n");
                 }
             }
         });

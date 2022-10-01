@@ -14,23 +14,17 @@ public class ComponentFactory {
     private static final int TEXT_AREA_ROWS = 10;
     private static final int TEXT_AREA_COLUMNS = 36;
 
-    private static final ComponentFactory INSTANCE = new ComponentFactory();
-
     private ComponentFactory() {
     }
 
-    public static ComponentFactory getInstance() {
-        return INSTANCE;
-    }
-
-    private void styleComponent(JComponent component) {
+    private static void styleComponent(JComponent component) {
         component.setBackground(BACKGROUND_COLOR);
         component.setFont(FONT);
         component.setForeground(MAIN_COLOR);
         component.setOpaque(true);
     }
 
-    public JLabel buildLabel(String text) {
+    public static JLabel buildLabel(String text) {
         JLabel label = new JLabel(text);
         label.setHorizontalTextPosition(SwingConstants.CENTER);
         label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -39,7 +33,7 @@ public class ComponentFactory {
         return label;
     }
 
-    public JScrollPane buildScrollPane(JComponent component) {
+    public static JScrollPane buildScrollPane(JComponent component) {
         JScrollPane scrollPane = new JScrollPane(component);
         styleComponent(scrollPane);
         scrollPane.getVerticalScrollBar().setBackground(BACKGROUND_COLOR);
@@ -52,7 +46,7 @@ public class ComponentFactory {
         return scrollPane;
     }
 
-    public JTextArea buildTextArea(boolean editable) {
+    public static JTextArea buildTextArea(boolean editable) {
         JTextArea textArea = new JTextArea(TEXT_AREA_ROWS, TEXT_AREA_COLUMNS);
         textArea.setEditable(editable);
         styleComponent(textArea);
@@ -64,17 +58,17 @@ public class ComponentFactory {
         return textArea;
     }
 
-    public void setUpFrame(JFrame frame, String title) {
+    public static void setUpFrame(JFrame frame, String title) {
         frame.setTitle(title);
         frame.getContentPane().setBackground(BACKGROUND_COLOR);
         frame.setUndecorated(false);
     }
 
-    public void setUpPanel(JPanel panel) {
+    public static void setUpPanel(JPanel panel) {
         styleComponent(panel);
     }
 
-    public JSpinner buildSpinner(SpinnerModel model) {
+    public static JSpinner buildSpinner(SpinnerModel model) {
         JSpinner spinner = new JSpinner(model);
         styleComponent(spinner);
         return spinner;

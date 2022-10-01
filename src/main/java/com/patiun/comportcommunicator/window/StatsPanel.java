@@ -1,55 +1,39 @@
 package com.patiun.comportcommunicator.window;
 
-import com.fazecast.jSerialComm.SerialPort;
+import com.patiun.comportcommunicator.entity.Packet;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
+import com.patiun.comportcommunicator.util.StuffedBytesHighlighter;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
 import java.awt.*;
-import java.util.LinkedHashMap;
 
 public class StatsPanel extends JPanel {
 
-    private final LinkedHashMap<String, Integer> portNamesToBytes = new LinkedHashMap<>();
-
     private final JTextArea textArea;
+    private final StuffedBytesHighlighter stuffedBytesHighlighter;
 
-    public StatsPanel(String inputPort) {
+    public StatsPanel(StuffedBytesHighlighter stuffedBytesHighlighter) {
         super();
-        ComponentFactory.getInstance().setUpPanel(this);
+        ComponentFactory.setUpPanel(this);
         setLayout(new BorderLayout());
 
-        SerialPort serialPort = SerialPort.getCommPort(inputPort);
-        portNamesToBytes.put(serialPort.getSystemPortName(), 0);
+        add(ComponentFactory.buildLabel("Current data frame (stuffed bytes highlighted red)"), BorderLayout.PAGE_START);
 
-        add(ComponentFactory.getInstance().buildLabel("Stats"), BorderLayout.PAGE_START);
-
-        textArea = ComponentFactory.getInstance().buildTextArea(false);
-        updateTextArea();
+        textArea = ComponentFactory.buildTextArea(false);
 
         add(textArea, BorderLayout.CENTER);
+
+        this.stuffedBytesHighlighter = stuffedBytesHighlighter;
     }
 
-    public void incrementBytesTransferred(String portName, int value) {
-        int currentValue = portNamesToBytes.get(portName);
-        portNamesToBytes.put(portName, currentValue + value);
-        updateTextArea();
-    }
-
-    private void updateTextArea() {
-        StringBuilder newText = new StringBuilder();
-//        boolean outputPort = false;
-        int previousBytes = 0;
-        for (String portName : portNamesToBytes.keySet()) {
-            newText.append(portName);
-//            if (outputPort) {
-            newText.append(" - Bytes sent: ").append(portNamesToBytes.get(portName) + previousBytes).append("\n");
-//            } else {
-//                newText.append(" -> ");
-//                previousBytes = portNamesToBytes.get(portName);
-//            }
-//            outputPort = !outputPort;
+    public void setMessage(String message) {
+        textArea.setText(message);
+        try {
+            stuffedBytesHighlighter.highlightStuffedBytes(textArea, Packet.ESCAPE_BYTE);
+        } catch (BadLocationException e) {
+            DebugPanel.getInstance().sendMessage("Stats", e.getMessage());
         }
-        textArea.setText(newText.toString());
     }
 
 }
