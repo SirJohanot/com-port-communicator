@@ -1,9 +1,12 @@
 package com.patiun.comportcommunicator.main;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.patiun.comportcommunicator.bytestuffing.ByteStuffer;
+import com.patiun.comportcommunicator.bytestuffing.COBSByteStuffer;
+import com.patiun.comportcommunicator.bytestuffing.highlighter.COBSStuffedBytesHighlighter;
+import com.patiun.comportcommunicator.bytestuffing.highlighter.StuffedBytesHighlighter;
 import com.patiun.comportcommunicator.exception.NoPortFoundException;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
-import com.patiun.comportcommunicator.util.StuffedBytesHighlighter;
 import com.patiun.comportcommunicator.window.*;
 
 import javax.swing.*;
@@ -49,11 +52,15 @@ public class Main {
 
             window.add(ControlPanel.getInstance(), BorderLayout.PAGE_START);
 
-            StatsPanel statsPanel = new StatsPanel(new StuffedBytesHighlighter());
+            StuffedBytesHighlighter stuffedBytesHighlighter = new COBSStuffedBytesHighlighter();
+//            StuffedBytesHighlighter stuffedBytesHighlighter = new HDLCStuffedBytesHighlighter(Packet.ESCAPE_BYTE);
+            StatsPanel statsPanel = new StatsPanel(stuffedBytesHighlighter);
             window.add(statsPanel, BorderLayout.CENTER);
 
-            window.add(new SenderPanel(inputSerialPort, statsPanel), BorderLayout.WEST);
-            window.add(new ReceiverPanel(outputSerialPort), BorderLayout.EAST);
+            ByteStuffer byteStuffer = new COBSByteStuffer();
+//            ByteStuffer byteStuffer = new HDLCByteStuffer(Packet.FLAG_BYTE, Packet.ESCAPE_BYTE);
+            window.add(new SenderPanel(inputSerialPort, byteStuffer, statsPanel), BorderLayout.WEST);
+            window.add(new ReceiverPanel(outputSerialPort, byteStuffer), BorderLayout.EAST);
 
         } catch (NoPortFoundException e) {
             DebugPanel.getInstance().sendMessage("System", e.getMessage());

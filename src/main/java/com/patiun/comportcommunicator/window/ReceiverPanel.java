@@ -16,10 +16,12 @@ public class ReceiverPanel extends JPanel {
 
     private final SerialPort outputPort;
 
+    private final ByteStuffer byteStuffer;
+
     private final JLabel name;
     private final JTextArea outputTextArea;
 
-    public ReceiverPanel(SerialPort outputPort) throws HeadlessException {
+    public ReceiverPanel(SerialPort outputPort, ByteStuffer byteStuffer) throws HeadlessException {
         super();
         ComponentFactory.setUpPanel(this);
         setLayout(new BorderLayout());
@@ -27,6 +29,8 @@ public class ReceiverPanel extends JPanel {
         this.outputPort = outputPort;
         setUpDataListener();
         ControlPanel.getInstance().registerPort(outputPort);
+
+        this.byteStuffer = byteStuffer;
 
         name = ComponentFactory.buildLabel(outputPort.getSystemPortName() + " - Receiver");
         add(name, BorderLayout.PAGE_START);
@@ -55,7 +59,7 @@ public class ReceiverPanel extends JPanel {
                     DebugPanel.getInstance().sendMessage(name.getText(), "Read message '" + new String(bytes) + "' as " + bytesRead + " bytes");
                     Packet receivedPacket = new Packet(bytes);
                     List<Byte> dataBytes = receivedPacket.getData();
-                    List<Byte> emptiedBytes = ByteStuffer.emptyBytes(dataBytes, Packet.ESCAPE_BYTE);
+                    List<Byte> emptiedBytes = byteStuffer.emptyBytes(dataBytes);
                     byte[] emptiedBytesPrimitiveArray = ByteListCaster.byteListToPrimitiveArray(emptiedBytes);
                     outputTextArea.append(new String(emptiedBytesPrimitiveArray) + "\n");
                 }

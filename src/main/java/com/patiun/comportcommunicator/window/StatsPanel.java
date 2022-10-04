@@ -1,14 +1,17 @@
 package com.patiun.comportcommunicator.window;
 
-import com.patiun.comportcommunicator.entity.Packet;
+import com.patiun.comportcommunicator.bytestuffing.highlighter.StuffedBytesHighlighter;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
-import com.patiun.comportcommunicator.util.StuffedBytesHighlighter;
+import com.patiun.comportcommunicator.util.ByteStringFormatter;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
+import java.util.List;
 
 public class StatsPanel extends JPanel {
+
+    private static final String BYTES_DELIMITER = " ";
 
     private final JTextArea textArea;
     private final StuffedBytesHighlighter stuffedBytesHighlighter;
@@ -27,10 +30,12 @@ public class StatsPanel extends JPanel {
         this.stuffedBytesHighlighter = stuffedBytesHighlighter;
     }
 
-    public void setMessage(String message) {
+    public void updateFrame(List<Byte> frameData) {
+        List<String> hexPresentation = ByteStringFormatter.byteListToHexStringList(frameData);
+        String message = String.join(BYTES_DELIMITER, hexPresentation);
         textArea.setText(message);
         try {
-            stuffedBytesHighlighter.highlightStuffedBytes(textArea, Packet.ESCAPE_BYTE);
+            stuffedBytesHighlighter.highlightStuffedBytes(textArea, BYTES_DELIMITER);
         } catch (BadLocationException e) {
             DebugPanel.getInstance().sendMessage("Stats", e.getMessage());
         }

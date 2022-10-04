@@ -4,7 +4,6 @@ import com.fazecast.jSerialComm.SerialPort;
 import com.patiun.comportcommunicator.bytestuffing.ByteStuffer;
 import com.patiun.comportcommunicator.entity.Packet;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
-import com.patiun.comportcommunicator.util.ByteListCaster;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,17 +23,21 @@ public class SenderPanel extends JPanel {
     private boolean flushedPacket = false;
     private final SerialPort inputPort;
 
+    private final ByteStuffer byteStuffer;
+
     private final StatsPanel statsPanel;
 
     private final JLabel name;
 
-    public SenderPanel(SerialPort inputPort, StatsPanel statsPanel) throws HeadlessException {
+    public SenderPanel(SerialPort inputPort, ByteStuffer byteStuffer, StatsPanel statsPanel) throws HeadlessException {
         super();
         ComponentFactory.setUpPanel(this);
         setLayout(new BorderLayout());
 
         this.inputPort = inputPort;
         ControlPanel.getInstance().registerPort(inputPort);
+
+        this.byteStuffer = byteStuffer;
 
         this.statsPanel = statsPanel;
 
@@ -70,9 +73,8 @@ public class SenderPanel extends JPanel {
                 }
                 byte keyByte = (byte) e.getKeyChar();
                 bufferedBytes.add(keyByte);
-                List<Byte> stuffedBytes = ByteStuffer.stuffBytes(bufferedBytes, Packet.FLAG_BYTE, Packet.ESCAPE_BYTE);
-                byte[] stuffedBytesPrimitiveArray = ByteListCaster.byteListToPrimitiveArray(stuffedBytes);
-                statsPanel.setMessage(new String(stuffedBytesPrimitiveArray));
+                List<Byte> stuffedBytes = byteStuffer.stuffBytes(bufferedBytes);
+                statsPanel.updateFrame(stuffedBytes);
                 if (bufferedBytes.size() == Packet.DATA_BYTES_NUMBER) {
                     Packet packetToSend = new Packet(getPortNumberByte(), stuffedBytes);
                     byte[] packetBytes = packetToSend.toBytes();
