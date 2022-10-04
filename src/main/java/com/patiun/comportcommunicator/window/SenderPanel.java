@@ -11,12 +11,14 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class SenderPanel extends JPanel {
 
     private static final String ACCEPTED_CHARACTERS_REGEX = "[ -~]";
+    private static final List<Character> forbiddenCharacters = Arrays.asList((char) KeyEvent.VK_BACK_SPACE, (char) KeyEvent.VK_DELETE, '\n');
 
     private final List<Byte> bufferedBytes = new ArrayList<>();
     private boolean flushedPacket = false;
@@ -50,7 +52,7 @@ public class SenderPanel extends JPanel {
         inputTextArea.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyChar() == KeyEvent.VK_BACK_SPACE || e.getKeyChar() == KeyEvent.VK_DELETE) {
+                if (forbiddenCharacters.contains(e.getKeyChar())) {
                     e.consume();
                 }
             }
