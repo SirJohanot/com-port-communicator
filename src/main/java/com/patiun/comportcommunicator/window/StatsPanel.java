@@ -30,12 +30,12 @@ public class StatsPanel extends JPanel {
         this.stuffedBytesHighlighter = stuffedBytesHighlighter;
     }
 
-    public void updateFrame(List<Byte> frameData) {
+    public void updateFrame(List<Byte> frameData, int stuffedBytesBeginningIndex, int stuffedBytesEndIndex) {
         List<String> hexPresentation = ByteStringFormatter.byteListToHexStringList(frameData);
         String message = String.join(BYTES_DELIMITER, hexPresentation);
         textArea.setText(message);
         try {
-            stuffedBytesHighlighter.highlightStuffedBytes(textArea, BYTES_DELIMITER);
+            stuffedBytesHighlighter.highlightStuffedBytes(textArea, BYTES_DELIMITER, stuffedBytesBeginningIndex, stuffedBytesEndIndex);
         } catch (BadLocationException e) {
             DebugPanel.getInstance().sendMessage("Stats", e.getMessage());
         }

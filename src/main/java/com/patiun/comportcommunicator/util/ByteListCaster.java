@@ -14,4 +14,5 @@ public class ByteListCaster {
         Byte[] bytesArray = byteList.toArray(new Byte[byteListSize]);
         return ArrayUtils.toPrimitive(bytesArray);
     }
+    
 }

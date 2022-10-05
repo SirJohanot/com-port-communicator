@@ -16,13 +16,13 @@ public class COBSStuffedBytesHighlighter implements StuffedBytesHighlighter {
     }
 
     @Override
-    public void highlightStuffedBytes(JTextArea textArea, String bytesDelimiter) throws BadLocationException {
+    public void highlightStuffedBytes(JTextArea textArea, String bytesDelimiter, int stuffedBytesBeginningIndex, int stuffedBytesEndIndex) throws BadLocationException {
         String text = textArea.getText();
         List<String> hexStringList = Arrays.asList(text.split(bytesDelimiter));
         List<Byte> bytes = ByteStringFormatter.hexStringListToByteList(hexStringList);
         Highlighter highlighter = textArea.getHighlighter();
-        int i = 0;
-        while (i < bytes.size()) {
+        int i = stuffedBytesBeginningIndex;
+        while (i < stuffedBytesEndIndex) {
             highlighter.addHighlight(i * 2 + i * bytesDelimiter.length(), i * 2 + i * bytesDelimiter.length() + 2, HIGHLIGHT_PAINTER);
             byte byteValue = bytes.get(i);
             if (byteValue == DELIMITER_BYTE) {

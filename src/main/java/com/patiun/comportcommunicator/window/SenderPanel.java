@@ -4,6 +4,7 @@ import com.fazecast.jSerialComm.SerialPort;
 import com.patiun.comportcommunicator.bytestuffing.ByteStuffer;
 import com.patiun.comportcommunicator.entity.Packet;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
+import org.apache.commons.lang3.ArrayUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -74,10 +75,11 @@ public class SenderPanel extends JPanel {
                 byte keyByte = (byte) e.getKeyChar();
                 bufferedBytes.add(keyByte);
                 List<Byte> stuffedBytes = byteStuffer.stuffBytes(bufferedBytes);
-                statsPanel.updateFrame(stuffedBytes);
+                Packet packet = new Packet(getPortNumberByte(), stuffedBytes);
+                byte[] packetBytes = packet.toBytes();
+                List<Byte> packetBytesList = Arrays.asList(ArrayUtils.toObject(packetBytes));
+                statsPanel.updateFrame(packetBytesList, 3, 3 + stuffedBytes.size());
                 if (bufferedBytes.size() == Packet.DATA_BYTES_NUMBER) {
-                    Packet packetToSend = new Packet(getPortNumberByte(), stuffedBytes);
-                    byte[] packetBytes = packetToSend.toBytes();
                     int bytesWritten = inputPort.writeBytes(packetBytes, packetBytes.length);
                     flushedPacket = true;
                     DebugPanel.getInstance().sendMessage(name.getText(), "Sent " + bytesWritten + " bytes");
