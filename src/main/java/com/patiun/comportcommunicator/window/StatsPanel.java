@@ -21,7 +21,7 @@ public class StatsPanel extends JPanel {
         ComponentFactory.setUpPanel(this);
         setLayout(new BorderLayout());
 
-        add(ComponentFactory.buildLabel("Current frame contents, hexadecimal (stuffed bytes are highlighted in red)"), BorderLayout.PAGE_START);
+        add(ComponentFactory.buildLabel("Contents of the latest sent packet, hexadecimal (stuffed bytes are highlighted in red)"), BorderLayout.PAGE_START);
 
         textArea = ComponentFactory.buildTextArea(false);
 

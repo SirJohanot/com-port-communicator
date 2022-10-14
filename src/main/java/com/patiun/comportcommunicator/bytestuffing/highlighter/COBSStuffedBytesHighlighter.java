@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.patiun.comportcommunicator.bytestuffing.COBSByteStuffer.DELIMITER_BYTE;
+import static com.patiun.comportcommunicator.bytestuffing.COBSByteStuffer.END_BYTE;
 
 public class COBSStuffedBytesHighlighter implements StuffedBytesHighlighter {
 
@@ -20,15 +21,17 @@ public class COBSStuffedBytesHighlighter implements StuffedBytesHighlighter {
         String text = textArea.getText();
         List<String> hexStringList = Arrays.asList(text.split(bytesDelimiter));
         List<Byte> bytes = ByteStringFormatter.hexStringListToByteList(hexStringList);
+//        DebugPanel.getInstance().sendMessage("highlighting", "bytes " + bytes);
         Highlighter highlighter = textArea.getHighlighter();
         int i = stuffedBytesBeginningIndex;
         while (i < stuffedBytesEndIndex) {
+//            DebugPanel.getInstance().sendMessage("highlighting", "start " + (i * 2 + i * bytesDelimiter.length()) + " end " + (i * 2 + i * bytesDelimiter.length() + 2));
             highlighter.addHighlight(i * 2 + i * bytesDelimiter.length(), i * 2 + i * bytesDelimiter.length() + 2, HIGHLIGHT_PAINTER);
-            byte byteValue = bytes.get(i);
-            if (byteValue == DELIMITER_BYTE) {
+            int byteValue = Byte.toUnsignedInt(bytes.get(i));
+            if (byteValue == END_BYTE) {
                 break;
             }
-            i += byteValue;
+            i += byteValue - DELIMITER_BYTE;
         }
     }
 }

@@ -67,7 +67,7 @@ public class Main {
         }
 
         window.add(DebugPanel.getInstance(), BorderLayout.PAGE_END);
-        
+
         window.pack();
         window.setVisible(true);
     }

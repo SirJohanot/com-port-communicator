@@ -6,7 +6,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>comPortCommunicator</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>2.0-COBS</version>
 
     <properties>
         <maven.compiler.source>18</maven.compiler.source>
@@ -54,5 +54,5 @@
             <version>3.3.0</version>
         </dependency>
     </dependencies>
-    
+
 </project>

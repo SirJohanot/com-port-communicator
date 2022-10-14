@@ -74,12 +74,12 @@ public class SenderPanel extends JPanel {
                 }
                 byte keyByte = (byte) e.getKeyChar();
                 bufferedBytes.add(keyByte);
-                List<Byte> stuffedBytes = byteStuffer.stuffBytes(bufferedBytes);
-                Packet packet = new Packet(getPortNumberByte(), stuffedBytes);
-                byte[] packetBytes = packet.toBytes();
-                List<Byte> packetBytesList = Arrays.asList(ArrayUtils.toObject(packetBytes));
-                statsPanel.updateFrame(packetBytesList, 3, 3 + stuffedBytes.size());
                 if (bufferedBytes.size() == Packet.DATA_BYTES_NUMBER) {
+                    List<Byte> stuffedBytes = byteStuffer.stuffBytes(bufferedBytes);
+                    Packet packet = new Packet(getPortNumberByte(), stuffedBytes);
+                    byte[] packetBytes = packet.toBytes();
+                    List<Byte> packetBytesList = Arrays.asList(ArrayUtils.toObject(packetBytes));
+                    statsPanel.updateFrame(packetBytesList, 3, 3 + stuffedBytes.size());
                     int bytesWritten = inputPort.writeBytes(packetBytes, packetBytes.length);
                     flushedPacket = true;
                     DebugPanel.getInstance().sendMessage(name.getText(), "Sent " + bytesWritten + " bytes");

@@ -16,7 +16,7 @@ public class ByteStringFormatter {
     public static List<Byte> hexStringListToByteList(List<String> hexString) {
         List<Byte> bytes = new ArrayList<>();
         for (String s : hexString) {
-            byte hexByte = Byte.parseByte(s, 16);
+            byte hexByte = (byte) Integer.parseInt(s, 16);
             bytes.add(hexByte);
         }
         return bytes;
