@@ -11,6 +11,7 @@ import com.patiun.comportcommunicator.window.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 
 import static com.patiun.comportcommunicator.config.PortDescriptor.*;
 
@@ -26,6 +27,8 @@ public class Main {
         window.setLayout(new BorderLayout());
 
         try {
+            DebugPanel.getInstance().sendMessage("System", "Found the following ports: " + Arrays.toString(SerialPort.getCommPorts()));
+
             topologyCheck();
 
             String inputDescriptor;
