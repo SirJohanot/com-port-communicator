@@ -17,16 +17,14 @@ public class COBSStuffedBytesHighlighter implements StuffedBytesHighlighter {
     }
 
     @Override
-    public void highlightStuffedBytes(JTextArea textArea, String bytesDelimiter, int stuffedBytesBeginningIndex, int stuffedBytesEndIndex) throws BadLocationException {
+    public void highlightStuffedBytes(JTextArea textArea, String textAreaBytesDelimiterRegex, String frameBytesDelimiter, int stuffedBytesBeginningIndex, int stuffedBytesEndIndex) throws BadLocationException {
         String text = textArea.getText();
-        List<String> hexStringList = Arrays.asList(text.split(bytesDelimiter));
+        List<String> hexStringList = Arrays.asList(text.split(textAreaBytesDelimiterRegex));
         List<Byte> bytes = ByteStringFormatter.hexStringListToByteList(hexStringList);
-//        DebugPanel.getInstance().sendMessage("highlighting", "bytes " + bytes);
         Highlighter highlighter = textArea.getHighlighter();
         int i = stuffedBytesBeginningIndex;
         while (i < stuffedBytesEndIndex) {
-//            DebugPanel.getInstance().sendMessage("highlighting", "start " + (i * 2 + i * bytesDelimiter.length()) + " end " + (i * 2 + i * bytesDelimiter.length() + 2));
-            highlighter.addHighlight(i * 2 + i * bytesDelimiter.length(), i * 2 + i * bytesDelimiter.length() + 2, HIGHLIGHT_PAINTER);
+            highlighter.addHighlight(i * 2 + i * frameBytesDelimiter.length(), i * 2 + i * frameBytesDelimiter.length() + 2, HIGHLIGHT_PAINTER);
             int byteValue = Byte.toUnsignedInt(bytes.get(i));
             if (byteValue == END_BYTE) {
                 break;

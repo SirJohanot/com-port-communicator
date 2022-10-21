@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface ByteStuffer {
 
-    public List<Byte> stuffBytes(List<Byte> bytes);
+    List<Byte> stuffBytes(List<Byte> bytes);
 
-    public List<Byte> emptyBytes(List<Byte> stuffedBytes);
+    List<Byte> restoreBytes(List<Byte> stuffedBytes);
 }

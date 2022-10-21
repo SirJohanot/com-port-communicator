@@ -10,5 +10,5 @@ public interface StuffedBytesHighlighter {
 
     Highlighter.HighlightPainter HIGHLIGHT_PAINTER = new DefaultHighlighter.DefaultHighlightPainter(Color.RED);
 
-    public void highlightStuffedBytes(JTextArea textArea, String bytesDelimiter, int stuffedBytesBeginningIndex, int stuffedBytesEndIndex) throws BadLocationException;
+    void highlightStuffedBytes(JTextArea textArea, String textAreaBytesDelimiterRegex, String frameBytesDelimiter, int stuffedBytesBeginningIndex, int stuffedBytesEndIndex) throws BadLocationException;
 }

@@ -27,7 +27,7 @@ public class COBSByteStuffer implements ByteStuffer {
     }
 
     @Override
-    public List<Byte> emptyBytes(List<Byte> stuffedBytes) {
+    public List<Byte> restoreBytes(List<Byte> stuffedBytes) {
         List<Byte> bytes = new ArrayList<>();
         int bytesUntilDelimiter = Byte.toUnsignedInt(stuffedBytes.get(0)) - DELIMITER_BYTE - 1;
         stuffedBytes.remove(0);

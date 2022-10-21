@@ -17,11 +17,10 @@ import java.util.regex.Pattern;
 
 public class SenderPanel extends JPanel {
 
-    private static final String ACCEPTED_CHARACTERS_REGEX = "[ -~]";
-    private static final List<Character> forbiddenCharacters = Arrays.asList((char) KeyEvent.VK_BACK_SPACE, (char) KeyEvent.VK_DELETE, '\n');
+    private static final String ACCEPTED_CHARACTERS_REGEX = "[ -~\n]";
+    private static final List<Character> forbiddenCharacters = Arrays.asList((char) KeyEvent.VK_BACK_SPACE, (char) KeyEvent.VK_DELETE);
 
     private final List<Byte> bufferedBytes = new ArrayList<>();
-    private boolean flushedPacket = false;
     private final SerialPort inputPort;
 
     private final ByteStuffer byteStuffer;
@@ -68,10 +67,6 @@ public class SenderPanel extends JPanel {
                     return;
                 }
                 inputTextArea.setCaretPosition(inputTextArea.getDocument().getLength());
-                if (flushedPacket) {
-                    inputTextArea.append("\n");
-                    flushedPacket = false;
-                }
                 byte keyByte = (byte) e.getKeyChar();
                 bufferedBytes.add(keyByte);
                 if (bufferedBytes.size() == Packet.DATA_BYTES_NUMBER) {
@@ -81,7 +76,6 @@ public class SenderPanel extends JPanel {
                     List<Byte> packetBytesList = Arrays.asList(ArrayUtils.toObject(packetBytes));
                     statsPanel.updateFrame(packetBytesList, 3, 3 + stuffedBytes.size());
                     int bytesWritten = inputPort.writeBytes(packetBytes, packetBytes.length);
-                    flushedPacket = true;
                     DebugPanel.getInstance().sendMessage(name.getText(), "Sent " + bytesWritten + " bytes");
                     bufferedBytes.clear();
                 }

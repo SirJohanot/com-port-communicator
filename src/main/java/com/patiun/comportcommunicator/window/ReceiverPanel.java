@@ -6,11 +6,11 @@ import com.fazecast.jSerialComm.SerialPortEvent;
 import com.patiun.comportcommunicator.bytestuffing.ByteStuffer;
 import com.patiun.comportcommunicator.entity.Packet;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
-import com.patiun.comportcommunicator.util.ByteListCaster;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ReceiverPanel extends JPanel {
 
@@ -59,9 +59,11 @@ public class ReceiverPanel extends JPanel {
                     DebugPanel.getInstance().sendMessage(name.getText(), "Read message '" + new String(bytes) + "' as " + bytesRead + " bytes");
                     Packet receivedPacket = new Packet(bytes);
                     List<Byte> dataBytes = receivedPacket.getData();
-                    List<Byte> emptiedBytes = byteStuffer.emptyBytes(dataBytes);
-                    byte[] emptiedBytesPrimitiveArray = ByteListCaster.byteListToPrimitiveArray(emptiedBytes);
-                    outputTextArea.append(new String(emptiedBytesPrimitiveArray) + "\n");
+                    List<Byte> emptiedBytes = byteStuffer.restoreBytes(dataBytes);
+                    String restoredBytesString = emptiedBytes.stream()
+                            .map(b -> String.valueOf((char) b.byteValue()))
+                            .collect(Collectors.joining());
+                    outputTextArea.append(restoredBytesString);
                 }
             }
         });

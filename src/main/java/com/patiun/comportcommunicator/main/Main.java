@@ -56,12 +56,10 @@ public class Main {
             window.add(ControlPanel.getInstance(), BorderLayout.PAGE_START);
 
             StuffedBytesHighlighter stuffedBytesHighlighter = new COBSStuffedBytesHighlighter();
-//            StuffedBytesHighlighter stuffedBytesHighlighter = new HDLCStuffedBytesHighlighter(Packet.ESCAPE_BYTE);
             StatsPanel statsPanel = new StatsPanel(stuffedBytesHighlighter);
             window.add(statsPanel, BorderLayout.CENTER);
 
             ByteStuffer byteStuffer = new COBSByteStuffer();
-//            ByteStuffer byteStuffer = new HDLCByteStuffer(Packet.FLAG_BYTE, Packet.ESCAPE_BYTE);
             window.add(new SenderPanel(inputSerialPort, byteStuffer, statsPanel), BorderLayout.WEST);
             window.add(new ReceiverPanel(outputSerialPort, byteStuffer), BorderLayout.EAST);
 
