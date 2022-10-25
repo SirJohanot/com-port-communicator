@@ -1,1 +1,1 @@
-# comPortCommunicator
+# com-port-communicator
