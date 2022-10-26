@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="bd5d9a41-7cde-43da-80be-d928220462a9" name="Changes" comment="added a check for proper port configuration" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="OptimizeOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="ProjectId" id="2EftFoWWzMvT2nD5ne2AHumy3lb" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="settings.editor.selected.configurable" value="actions.on.save" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.patiun.comportcommunicator.bytestuffing" />
+      <recent name="com.patiun.comportcommunicator.bytestuffing.highlighter" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.Main">
+    <configuration name="Main" type="Application" factoryName="Application" singleton="false" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.patiun.comportcommunicator.main.Main" />
+      <module name="comPortCommunicator" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.patiun.comportcommunicator.main.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="comPortCommunicator-1.0-SNAPSHOT.jar" type="JarApplication" temporary="true">
+      <option name="JAR_PATH" value="$PROJECT_DIR$/target/comPortCommunicator-1.0-SNAPSHOT.jar" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+        <item itemvalue="JAR Application.comPortCommunicator-1.0-SNAPSHOT.jar" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="bd5d9a41-7cde-43da-80be-d928220462a9" name="Changes" comment="" />
+      <created>1662998366233</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1662998366233</updated>
+      <workItem from="1662998369191" duration="973000" />
+      <workItem from="1662999369199" duration="214000" />
+      <workItem from="1663081127643" duration="2676000" />
+      <workItem from="1663086159708" duration="41000" />
+      <workItem from="1663140258137" duration="1827000" />
+      <workItem from="1663153990817" duration="25000" />
+      <workItem from="1663172545342" duration="9000" />
+      <workItem from="1663254731661" duration="2131000" />
+      <workItem from="1663265578119" duration="3747000" />
+      <workItem from="1663308174398" duration="2117000" />
+      <workItem from="1663310886544" duration="1460000" />
+      <workItem from="1663312559812" duration="282000" />
+      <workItem from="1663401468406" duration="2027000" />
+      <workItem from="1663408749584" duration="6728000" />
+      <workItem from="1663420385030" duration="2976000" />
+      <workItem from="1663512711520" duration="14000" />
+      <workItem from="1663922058791" duration="1748000" />
+      <workItem from="1663925511577" duration="2505000" />
+      <workItem from="1664289461779" duration="11000" />
+      <workItem from="1664517985412" duration="2212000" />
+      <workItem from="1664524221329" duration="130000" />
+      <workItem from="1664524376961" duration="210000" />
+      <workItem from="1664524689424" duration="95000" />
+      <workItem from="1664542523726" duration="4000" />
+      <workItem from="1664640647257" duration="1499000" />
+      <workItem from="1664648426897" duration="5515000" />
+      <workItem from="1664705958943" duration="2000" />
+      <workItem from="1664725088379" duration="12000" />
+      <workItem from="1664876740004" duration="898000" />
+      <workItem from="1664895139255" duration="7068000" />
+      <workItem from="1664955222710" duration="1794000" />
+      <workItem from="1664967412400" duration="998000" />
+      <workItem from="1664975415444" duration="1475000" />
+      <workItem from="1665057428382" duration="63000" />
+      <workItem from="1665127954608" duration="922000" />
+      <workItem from="1665159336041" duration="622000" />
+      <workItem from="1665227238365" duration="112000" />
+      <workItem from="1665304281723" duration="4000" />
+      <workItem from="1665727722287" duration="4245000" />
+      <workItem from="1665732428463" duration="2392000" />
+      <workItem from="1665852697095" duration="7000" />
+      <workItem from="1666294026560" duration="887000" />
+      <workItem from="1666336965865" duration="5415000" />
+      <workItem from="1666454498839" duration="561000" />
+    </task>
+    <task id="LOCAL-00001" summary="added a statistics window, updated design, reworked some code">
+      <created>1662999569914</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1662999569914</updated>
+    </task>
+    <task id="LOCAL-00002" summary="reworked port configuration; added more information to debug">
+      <created>1663085395353</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1663085395353</updated>
+    </task>
+    <task id="LOCAL-00003" summary="reworked code to use port descriptors instead of port indices">
+      <created>1663086101038</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1663086101038</updated>
+    </task>
+    <task id="LOCAL-00004" summary="changed the port sequence in the configuration">
+      <created>1663086195901</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1663086195902</updated>
+    </task>
+    <task id="LOCAL-00005" summary="added more messages to debug; fixed setting data bits">
+      <created>1663142372037</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1663142372037</updated>
+    </task>
+    <task id="LOCAL-00006" summary="reworked design to only use one window; cleaned up code; added a check for the requested COM ports">
+      <created>1663419132129</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1663419132129</updated>
+    </task>
+    <task id="LOCAL-00007" summary="added a check for proper port configuration">
+      <created>1663927933667</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1663927933667</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="added a statistics window, updated design, reworked some code" />
+    <MESSAGE value="reworked port configuration; added more information to debug" />
+    <MESSAGE value="reworked code to use port descriptors instead of port indices" />
+    <MESSAGE value="changed the port sequence in the configuration" />
+    <MESSAGE value="added more messages to debug; fixed setting data bits" />
+    <MESSAGE value="reworked design to only use one window; cleaned up code; added a check for the requested COM ports" />
+    <MESSAGE value="added a check for proper port configuration" />
+    <option name="LAST_COMMIT_MESSAGE" value="added a check for proper port configuration" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>
