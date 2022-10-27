@@ -1,7 +1,9 @@
 package com.patiun.comportcommunicator.window;
 
-import com.patiun.comportcommunicator.bytestuffing.highlighter.StuffedBytesHighlighter;
+import com.patiun.comportcommunicator.bytestuffing.highlighter.COBSStuffedBytesHighlighter;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
+import com.patiun.comportcommunicator.highlighter.BytesHighlighter;
+import com.patiun.comportcommunicator.highlighter.FcsHighlighter;
 import com.patiun.comportcommunicator.util.ByteStringFormatter;
 
 import javax.swing.*;
@@ -15,9 +17,8 @@ public class StatsPanel extends JPanel {
     private static final String BYTES_DELIMITER_REGEX = "[ \n]";
 
     private final JTextArea textArea;
-    private final StuffedBytesHighlighter stuffedBytesHighlighter;
 
-    public StatsPanel(StuffedBytesHighlighter stuffedBytesHighlighter) {
+    public StatsPanel() {
         super();
         ComponentFactory.setUpPanel(this);
         setLayout(new BorderLayout());
@@ -28,18 +29,31 @@ public class StatsPanel extends JPanel {
         textArea.setText("");
 
         add(ComponentFactory.buildScrollPane(textArea), BorderLayout.CENTER);
-
-        this.stuffedBytesHighlighter = stuffedBytesHighlighter;
     }
 
-    public void updateFrame(List<Byte> frameData, int stuffedBytesBeginningIndex, int stuffedBytesEndIndex) {
-        List<String> hexPresentation = ByteStringFormatter.byteListToHexStringList(frameData);
-        String message = String.join(FRAME_BYTES_DELIMITER, hexPresentation);
+    public void updateStuffedFrame(List<Byte> frameData, int stuffedBytesBeginningIndex, int stuffedBytesEndIndex, int fcsByteIndex) {
+        List<String> stringPresentation = ByteStringFormatter.byteListToStringList(frameData);
+        String message = String.join(FRAME_BYTES_DELIMITER, stringPresentation);
         String currentText = textArea.getText();
         int currentLength = currentText.equals("") ? 0 : currentText.split(BYTES_DELIMITER_REGEX).length;
         textArea.append(message + "\n");
+        BytesHighlighter bytesHighlighter = new COBSStuffedBytesHighlighter(new FcsHighlighter(currentLength + fcsByteIndex), currentLength + stuffedBytesBeginningIndex, currentLength + stuffedBytesEndIndex);
         try {
-            stuffedBytesHighlighter.highlightStuffedBytes(textArea, BYTES_DELIMITER_REGEX, FRAME_BYTES_DELIMITER, currentLength + stuffedBytesBeginningIndex, currentLength + stuffedBytesEndIndex);
+            bytesHighlighter.highlightBytes(textArea, BYTES_DELIMITER_REGEX, FRAME_BYTES_DELIMITER);
+        } catch (BadLocationException e) {
+            DebugPanel.getInstance().sendMessage("Stats", e.getMessage());
+        }
+    }
+
+    public void updateNonStuffedFrame(List<Byte> frameData, int fcsByteIndex) {
+        List<String> stringPresentation = ByteStringFormatter.byteListToStringList(frameData);
+        String message = String.join(FRAME_BYTES_DELIMITER, stringPresentation);
+        String currentText = textArea.getText();
+        int currentLength = currentText.equals("") ? 0 : currentText.split(BYTES_DELIMITER_REGEX).length;
+        textArea.append(message + "\n");
+        BytesHighlighter bytesHighlighter = new FcsHighlighter(currentLength + fcsByteIndex);
+        try {
+            bytesHighlighter.highlightBytes(textArea, BYTES_DELIMITER_REGEX, FRAME_BYTES_DELIMITER);
         } catch (BadLocationException e) {
             DebugPanel.getInstance().sendMessage("Stats", e.getMessage());
         }

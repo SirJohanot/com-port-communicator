@@ -59,11 +59,13 @@ public class ReceiverPanel extends JPanel {
                     DebugPanel.getInstance().sendMessage(name.getText(), "Read message '" + new String(bytes) + "' as " + bytesRead + " bytes");
                     Packet receivedPacket = new Packet(bytes);
                     List<Byte> dataBytes = receivedPacket.getData();
-                    List<Byte> emptiedBytes = byteStuffer.restoreBytes(dataBytes);
-                    String restoredBytesString = emptiedBytes.stream()
+                    if (dataBytes.size() > Packet.DATA_BYTES_NUMBER) {
+                        dataBytes = byteStuffer.restoreBytes(dataBytes);
+                    }
+                    String bytesString = dataBytes.stream()
                             .map(b -> String.valueOf((char) b.byteValue()))
                             .collect(Collectors.joining());
-                    outputTextArea.append(restoredBytesString);
+                    outputTextArea.append(bytesString);
                 }
             }
         });

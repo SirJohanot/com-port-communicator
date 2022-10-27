@@ -3,8 +3,6 @@ package com.patiun.comportcommunicator.main;
 import com.fazecast.jSerialComm.SerialPort;
 import com.patiun.comportcommunicator.bytestuffing.ByteStuffer;
 import com.patiun.comportcommunicator.bytestuffing.COBSByteStuffer;
-import com.patiun.comportcommunicator.bytestuffing.highlighter.COBSStuffedBytesHighlighter;
-import com.patiun.comportcommunicator.bytestuffing.highlighter.StuffedBytesHighlighter;
 import com.patiun.comportcommunicator.exception.NoPortFoundException;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
 import com.patiun.comportcommunicator.window.*;
@@ -55,8 +53,7 @@ public class Main {
 
             window.add(ControlPanel.getInstance(), BorderLayout.PAGE_START);
 
-            StuffedBytesHighlighter stuffedBytesHighlighter = new COBSStuffedBytesHighlighter();
-            StatsPanel statsPanel = new StatsPanel(stuffedBytesHighlighter);
+            StatsPanel statsPanel = new StatsPanel();
             window.add(statsPanel, BorderLayout.CENTER);
 
             ByteStuffer byteStuffer = new COBSByteStuffer();

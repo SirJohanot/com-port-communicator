@@ -8,7 +8,9 @@ public class Packet {
     public static final int DATA_BYTES_NUMBER = 23;
 
     public static final byte FLAG_BYTE = 'a' + DATA_BYTES_NUMBER;
-    public static final byte ESCAPE_BYTE = 'h';
+
+    public static final int CONTROL_VALUE = 337; //2^7+2^6+2^4+2^0
+    public static final int FCS_SIZE = 8;
 
     private final byte flag;
     private final byte destinationAddress;

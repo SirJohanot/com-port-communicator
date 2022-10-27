@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 public class SenderPanel extends JPanel {
 
-    private static final String ACCEPTED_CHARACTERS_REGEX = "[ -~\n]";
+    private static final String ACCEPTED_CHARACTERS_REGEX = "[ -~]";
     private static final List<Character> forbiddenCharacters = Arrays.asList((char) KeyEvent.VK_BACK_SPACE, (char) KeyEvent.VK_DELETE);
 
     private final List<Byte> bufferedBytes = new ArrayList<>();
@@ -70,11 +70,23 @@ public class SenderPanel extends JPanel {
                 byte keyByte = (byte) e.getKeyChar();
                 bufferedBytes.add(keyByte);
                 if (bufferedBytes.size() == Packet.DATA_BYTES_NUMBER) {
-                    List<Byte> stuffedBytes = byteStuffer.stuffBytes(bufferedBytes);
-                    Packet packet = new Packet(getPortNumberByte(), stuffedBytes);
+                    boolean stuffedFrame;
+                    Packet packet;
+                    if (bufferedBytes.contains(Packet.FLAG_BYTE)) {
+                        List<Byte> stuffedBytes = byteStuffer.stuffBytes(bufferedBytes);
+                        packet = new Packet(getPortNumberByte(), stuffedBytes);
+                        stuffedFrame = true;
+                    } else {
+                        packet = new Packet(getPortNumberByte(), bufferedBytes);
+                        stuffedFrame = false;
+                    }
                     byte[] packetBytes = packet.toBytes();
                     List<Byte> packetBytesList = Arrays.asList(ArrayUtils.toObject(packetBytes));
-                    statsPanel.updateFrame(packetBytesList, 3, 3 + stuffedBytes.size());
+                    if (stuffedFrame) {
+                        statsPanel.updateStuffedFrame(packetBytesList, 3, 3 + packet.getData().size(), packetBytesList.size() - 1);
+                    } else {
+                        statsPanel.updateNonStuffedFrame(packetBytesList, packetBytesList.size() - 1);
+                    }
                     int bytesWritten = inputPort.writeBytes(packetBytes, packetBytes.length);
                     DebugPanel.getInstance().sendMessage(name.getText(), "Sent " + bytesWritten + " bytes");
                     bufferedBytes.clear();
