@@ -9,7 +9,7 @@ public class Packet {
 
     public static final byte FLAG_BYTE = 'a' + DATA_BYTES_NUMBER;
 
-    public static final int CONTROL_VALUE = 337; //2^7+2^6+2^4+2^0
+    public static final int CONTROL_VALUE = 337; //2^8+2^6+2^4+2^0
     public static final int FCS_SIZE = 8;
 
     private final byte flag;
@@ -29,12 +29,12 @@ public class Packet {
         this.fcs = bytes[bytes.length - 1];
     }
 
-    public Packet(byte sourceAddress, List<Byte> data) {
+    public Packet(byte sourceAddress, List<Byte> data, Byte fcs) {
         this.flag = FLAG_BYTE;
         this.destinationAddress = 0;
         this.sourceAddress = sourceAddress;
         this.data = new ArrayList<>(data);
-        this.fcs = 0;
+        this.fcs = fcs;
     }
 
     public byte getFlag() {

@@ -4,6 +4,7 @@ import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
 import com.patiun.comportcommunicator.bytestuffing.ByteStuffer;
+import com.patiun.comportcommunicator.crc.CrcEncoder;
 import com.patiun.comportcommunicator.entity.Packet;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
 
@@ -61,6 +62,12 @@ public class ReceiverPanel extends JPanel {
                     List<Byte> dataBytes = receivedPacket.getData();
                     if (dataBytes.size() > Packet.DATA_BYTES_NUMBER) {
                         dataBytes = byteStuffer.restoreBytes(dataBytes);
+                    } else {
+                        Byte fcs = receivedPacket.getFcs();
+                        if (CrcEncoder.isCorrupted(dataBytes, fcs)) {
+                            DebugPanel.getInstance().sendMessage("Receiver", "Corruption detected in the received frame!");
+                            dataBytes = CrcEncoder.restoreData(dataBytes, fcs);
+                        }
                     }
                     String bytesString = dataBytes.stream()
                             .map(b -> String.valueOf((char) b.byteValue()))

@@ -2,6 +2,8 @@ package com.patiun.comportcommunicator.window;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.patiun.comportcommunicator.bytestuffing.ByteStuffer;
+import com.patiun.comportcommunicator.crc.CrcEncoder;
+import com.patiun.comportcommunicator.entity.Binary;
 import com.patiun.comportcommunicator.entity.Packet;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
 import org.apache.commons.lang3.ArrayUtils;
@@ -13,6 +15,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 public class SenderPanel extends JPanel {
@@ -72,12 +75,14 @@ public class SenderPanel extends JPanel {
                 if (bufferedBytes.size() == Packet.DATA_BYTES_NUMBER) {
                     boolean stuffedFrame;
                     Packet packet;
+                    Byte fcs = 0;
                     if (bufferedBytes.contains(Packet.FLAG_BYTE)) {
                         List<Byte> stuffedBytes = byteStuffer.stuffBytes(bufferedBytes);
-                        packet = new Packet(getPortNumberByte(), stuffedBytes);
+                        packet = new Packet(getPortNumberByte(), stuffedBytes, fcs);
                         stuffedFrame = true;
                     } else {
-                        packet = new Packet(getPortNumberByte(), bufferedBytes);
+                        fcs = CrcEncoder.calculateFcs(bufferedBytes);
+                        packet = new Packet(getPortNumberByte(), bufferedBytes, fcs);
                         stuffedFrame = false;
                     }
                     byte[] packetBytes = packet.toBytes();
@@ -86,7 +91,11 @@ public class SenderPanel extends JPanel {
                         statsPanel.updateStuffedFrame(packetBytesList, 3, 3 + packet.getData().size(), packetBytesList.size() - 1);
                     } else {
                         statsPanel.updateNonStuffedFrame(packetBytesList, packetBytesList.size() - 1);
+                        List<Byte> randomlyCorruptedDataBytes = randomCorruption(bufferedBytes);
+                        packet = new Packet(getPortNumberByte(), randomlyCorruptedDataBytes, fcs);
+                        packetBytes = packet.toBytes();
                     }
+                    DebugPanel.getInstance().sendMessage("Sender", "Sending " + new String(packetBytes));
                     int bytesWritten = inputPort.writeBytes(packetBytes, packetBytes.length);
                     DebugPanel.getInstance().sendMessage(name.getText(), "Sent " + bytesWritten + " bytes");
                     bufferedBytes.clear();
@@ -101,6 +110,24 @@ public class SenderPanel extends JPanel {
         String portName = inputPort.getSystemPortName();
         String portNumber = portName.substring(3);
         return Byte.parseByte(portNumber);
+    }
+
+    private List<Byte> randomCorruption(List<Byte> dataBytes) {
+        Random random = new Random();
+        if (random.nextBoolean()) {
+            return corruptRandomBit(dataBytes);
+        }
+        return dataBytes;
+    }
+
+    private List<Byte> corruptRandomBit(List<Byte> dataBytes) {
+        Binary dataBinary = Binary.of(dataBytes);
+        int dataBitsNumber = dataBinary.size();
+        int randomBitNumber = (int) (Math.random() * dataBitsNumber);
+        Boolean randomBit = dataBinary.get(randomBitNumber);
+        dataBinary.set(randomBitNumber, !randomBit);
+        DebugPanel.getInstance().sendMessage("Sender", "Corruption of bit " + randomBitNumber + " occurred!");
+        return dataBinary.toByteList();
     }
 
 }

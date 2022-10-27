@@ -7,6 +7,8 @@ import java.awt.*;
 
 public class DebugPanel extends JPanel {
 
+    private static final int CHARACTER_LIMIT = 8192;
+
     private static final DebugPanel INSTANCE = new DebugPanel();
 
     JTextArea textArea;
@@ -23,6 +25,10 @@ public class DebugPanel extends JPanel {
     }
 
     public void sendMessage(String windowTitle, String message) {
+        String currentText = textArea.getText();
+        if (currentText.length() > CHARACTER_LIMIT) {
+            textArea.setText("");
+        }
         textArea.append(windowTitle + ": " + message + "\n");
     }
 
