@@ -1,6 +1,7 @@
 package com.patiun.comportcommunicator.highlighter;
 
 import com.patiun.comportcommunicator.entity.Packet;
+import com.patiun.comportcommunicator.window.DebugPanel;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -29,6 +30,7 @@ public class FcsHighlighter extends AbstractChainedHighlighter {
         Highlighter highlighter = textArea.getHighlighter();
         int byteStartIndex = charIndexOfByte(fcsByteBeginIndex, stringList, frameBytesDelimiter);
         int byteEndIndex = charIndexOfByte(fcsByteBeginIndex + Packet.FCS_SIZE, stringList, frameBytesDelimiter);
+        DebugPanel.getInstance().sendMessage("FCS Highlighter", "Highlighting " + byteStartIndex + " through " + byteEndIndex);
         highlighter.addHighlight(byteStartIndex, byteEndIndex, HIGHLIGHT_PAINTER);
     }
 }
