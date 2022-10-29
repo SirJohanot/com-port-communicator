@@ -10,5 +10,5 @@ public interface BytesHighlighter {
 
     Highlighter.HighlightPainter HIGHLIGHT_PAINTER = new DefaultHighlighter.DefaultHighlightPainter(Color.RED);
 
-    void highlightBytes(JTextArea textArea, String textAreaBytesDelimiterRegex, String frameBytesDelimiter) throws BadLocationException;
+    void highlightBytes(JTextArea textArea, int oldLength, String textAreaBytesDelimiterRegex, String frameBytesDelimiter) throws BadLocationException;
 }

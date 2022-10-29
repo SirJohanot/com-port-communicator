@@ -1,19 +1,26 @@
 package com.patiun.comportcommunicator.window;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.patiun.comportcommunicator.bytecorrputer.ByteCorrupter;
+import com.patiun.comportcommunicator.bytecorrputer.FiftyPercentByteCorrupter;
+import com.patiun.comportcommunicator.bytecorrputer.NoCorruptionByteCorrupter;
 import com.patiun.comportcommunicator.bytestuffing.ByteStuffer;
+import com.patiun.comportcommunicator.bytestuffing.highlighter.COBSStuffedBytesHighlighter;
 import com.patiun.comportcommunicator.crc.CrcEncoder;
-import com.patiun.comportcommunicator.entity.Binary;
 import com.patiun.comportcommunicator.entity.Packet;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
+import com.patiun.comportcommunicator.highlighter.BytesHighlighter;
+import com.patiun.comportcommunicator.highlighter.FcsHighlighter;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.*;
 import java.util.regex.Pattern;
 
 public class SenderPanel extends JPanel {
@@ -71,32 +78,7 @@ public class SenderPanel extends JPanel {
                 byte keyByte = (byte) e.getKeyChar();
                 bufferedBytes.add(keyByte);
                 if (bufferedBytes.size() == Packet.DATA_BYTES_NUMBER) {
-                    boolean stuffedFrame;
-                    Packet packet;
-                    List<Byte> fcs = Collections.nCopies(Packet.FCS_SIZE, Byte.MIN_VALUE);
-                    if (bufferedBytes.contains(Packet.FLAG_BYTE)) {
-                        List<Byte> stuffedBytes = byteStuffer.stuffBytes(bufferedBytes);
-                        packet = new Packet(getPortNumberByte(), stuffedBytes, fcs);
-                        stuffedFrame = true;
-                    } else {
-                        fcs = CrcEncoder.calculateFcs(bufferedBytes);
-                        packet = new Packet(getPortNumberByte(), bufferedBytes, fcs);
-                        stuffedFrame = false;
-                    }
-                    byte[] packetBytes = packet.toBytes();
-                    List<Byte> packetBytesList = Arrays.asList(ArrayUtils.toObject(packetBytes));
-                    if (stuffedFrame) {
-                        statsPanel.updateStuffedFrame(packetBytesList, 3, 3 + packet.getData().size(), packetBytesList.size() - Packet.FCS_SIZE);
-                    } else {
-                        statsPanel.updateNonStuffedFrame(packetBytesList, packetBytesList.size() - Packet.FCS_SIZE);
-                        List<Byte> randomlyCorruptedDataBytes = randomCorruption(bufferedBytes);
-                        packet = new Packet(getPortNumberByte(), randomlyCorruptedDataBytes, fcs);
-                        packetBytes = packet.toBytes();
-                    }
-                    DebugPanel.getInstance().sendMessage("Sender", "Sending " + new String(packetBytes));
-                    int bytesWritten = inputPort.writeBytes(packetBytes, packetBytes.length);
-                    DebugPanel.getInstance().sendMessage(name.getText(), "Sent " + bytesWritten + " bytes");
-                    bufferedBytes.clear();
+                    sendPacket();
                 }
             }
         });
@@ -104,27 +86,48 @@ public class SenderPanel extends JPanel {
         return ComponentFactory.buildScrollPane(inputTextArea);
     }
 
+    private void sendPacket() {
+        List<Byte> dataBytes;
+        List<Byte> fcs;
+        BytesHighlighter bytesHighlighter;
+        ByteCorrupter byteCorrupter;
+
+        if (bufferedBytes.contains(Packet.FLAG_BYTE)) {
+            dataBytes = byteStuffer.stuffBytes(bufferedBytes);
+            fcs = Collections.nCopies(Packet.FCS_SIZE, Byte.MIN_VALUE);
+            bytesHighlighter = new COBSStuffedBytesHighlighter(new FcsHighlighter(dataBytes.size() + 3, Packet.FCS_SIZE), 3, dataBytes.size() + 3);
+            byteCorrupter = new NoCorruptionByteCorrupter();
+        } else {
+            dataBytes = bufferedBytes;
+            fcs = CrcEncoder.calculateFcs(bufferedBytes);
+            bytesHighlighter = new FcsHighlighter(dataBytes.size() + 3, Packet.FCS_SIZE);
+            byteCorrupter = new FiftyPercentByteCorrupter();
+        }
+
+        Packet packetToSend = formPacketAndUpdateFrame(dataBytes, fcs, bytesHighlighter, byteCorrupter);
+        byte[] packetBytes = packetToSend.toBytes();
+        DebugPanel.getInstance().sendMessage("Sender", "Sending " + new String(packetBytes));
+
+        int bytesWritten = inputPort.writeBytes(packetBytes, packetBytes.length);
+        DebugPanel.getInstance().sendMessage(name.getText(), "Sent " + bytesWritten + " bytes");
+        bufferedBytes.clear();
+    }
+
+    private Packet formPacketAndUpdateFrame(List<Byte> dataBytes, List<Byte> fcsBytes, BytesHighlighter highlighter, ByteCorrupter corrupter) {
+        Packet packet = new Packet(getPortNumberByte(), dataBytes, fcsBytes);
+
+        byte[] packetBytes = packet.toBytes();
+        List<Byte> packetBytesList = Arrays.asList(ArrayUtils.toObject(packetBytes));
+        statsPanel.updateFrame(packetBytesList, highlighter);
+
+        List<Byte> randomlyCorruptedDataBytes = corrupter.corruptByte(dataBytes);
+        return new Packet(getPortNumberByte(), randomlyCorruptedDataBytes, fcsBytes);
+    }
+
     private byte getPortNumberByte() {
         String portName = inputPort.getSystemPortName();
         String portNumber = portName.substring(3);
         return Byte.parseByte(portNumber);
-    }
-
-    private List<Byte> randomCorruption(List<Byte> dataBytes) {
-        Random random = new Random();
-        if (random.nextBoolean()) {
-            return corruptRandomBit(dataBytes);
-        }
-        return dataBytes;
-    }
-
-    private List<Byte> corruptRandomBit(List<Byte> dataBytes) {
-        Binary dataBinary = Binary.ofBytes(dataBytes);
-        int dataBitsNumber = dataBinary.length();
-        int randomBitNumber = (int) (Math.random() * dataBitsNumber);
-        Binary withReversedBit = dataBinary.reverseBit(randomBitNumber);
-        DebugPanel.getInstance().sendMessage("Sender", "Corruption of bit " + randomBitNumber + " occurred!");
-        return withReversedBit.toByteList();
     }
 
 }

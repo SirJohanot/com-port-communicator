@@ -3,7 +3,6 @@ package com.patiun.comportcommunicator.bytestuffing.highlighter;
 import com.patiun.comportcommunicator.highlighter.AbstractChainedHighlighter;
 import com.patiun.comportcommunicator.highlighter.BytesHighlighter;
 import com.patiun.comportcommunicator.util.ByteStringFormatter;
-import com.patiun.comportcommunicator.window.DebugPanel;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -31,16 +30,15 @@ public class COBSStuffedBytesHighlighter extends AbstractChainedHighlighter {
     }
 
     @Override
-    protected void personalHighlightBytes(JTextArea textArea, String textAreaBytesDelimiterRegex, String frameBytesDelimiter) throws BadLocationException {
+    protected void personalHighlightBytes(JTextArea textArea, int oldLength, String textAreaBytesDelimiterRegex, String frameBytesDelimiter) throws BadLocationException {
         String text = textArea.getText();
         List<String> stringList = Arrays.asList(text.split(textAreaBytesDelimiterRegex));
         List<Byte> bytes = ByteStringFormatter.stringListToByteList(stringList);
         Highlighter highlighter = textArea.getHighlighter();
-        int i = stuffedBytesBeginningIndex;
-        while (i < stuffedBytesEndIndex) {
+        int i = oldLength + stuffedBytesBeginningIndex;
+        while (i < oldLength + stuffedBytesEndIndex) {
             int byteStartIndex = charIndexOfByte(i, stringList, frameBytesDelimiter);
             int byteStringLength = stringList.get(i).length();
-            DebugPanel.getInstance().sendMessage("COBS Highlighter", "Highlighting " + byteStartIndex + " through " + byteStartIndex + byteStringLength);
             highlighter.addHighlight(byteStartIndex, byteStartIndex + byteStringLength, HIGHLIGHT_PAINTER);
             int byteValue = Byte.toUnsignedInt(bytes.get(i));
             if (byteValue == END_BYTE) {

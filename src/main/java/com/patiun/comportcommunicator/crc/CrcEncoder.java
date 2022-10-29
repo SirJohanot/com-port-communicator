@@ -18,7 +18,6 @@ public class CrcEncoder {
     }
 
     public static List<Byte> calculateFcs(List<Byte> frameDataBytes) {
-//        DebugPanel.getInstance().sendMessage("CRC", "Calculating fcs for bytes " + frameDataBytes);
         List<Byte> fcs = new ArrayList<>();
         for (int i = 0; i < frameDataBytes.size(); i += 2) {
             int subListEndIndex = (i < frameDataBytes.size() - 1) ? (i + 2) : i + 1;
@@ -52,13 +51,10 @@ public class CrcEncoder {
             Binary combinedDataBinary = frameDataBinary.combine(fcsBinary);
             Binary mod = combinedDataBinary.mod(CONTROL_VALUE_BINARY);
             byte modByte = (byte) mod.toInt();
-            DebugPanel.getInstance().sendMessage("CRC", "Mod of DATA+FCS is " + modByte);
             if (modByte != 0) {
                 DebugPanel.getInstance().sendMessage("CRC", "Found corruption in bytes " + i + " to " + subListEndIndex + ". Binary is " + frameDataBinary + " and fcs " + fcsBinary);
                 return true;
             }
-            DebugPanel.getInstance().sendMessage("CRC", "No corruption detected in bytes " + bytesSubList + " against FCS " + currentFcs);
-            DebugPanel.getInstance().sendMessage("CRC", "Bytes binary: " + Binary.ofBytes(bytesSubList) + " FCS binary: " + fcsBinary + " Combined: " + combinedDataBinary);
         }
         return false;
     }
@@ -66,7 +62,7 @@ public class CrcEncoder {
     public static List<Byte> restoreData(List<Byte> frameDataBytes, List<Byte> fcs) {
         int fcsIndex = 0;
         List<Byte> restoredData = new ArrayList<>();
-        for (int i = 0; i < frameDataBytes.size(); i += 2) {
+        for (int i = 0; i < frameDataBytes.size(); i += 2, fcsIndex++) {
             int subListEndIndex = (i < frameDataBytes.size() - 1) ? (i + 2) : i + 1;
             List<Byte> bytesSubList = frameDataBytes.subList(i, subListEndIndex);
             Binary dataBytesBinary = Binary.ofBytes(bytesSubList);
@@ -84,15 +80,13 @@ public class CrcEncoder {
                 Binary dataBytesBinaryCopy = dataBytesBinary.copy();
                 dataBytesBinaryCopy = dataBytesBinaryCopy.reverseBit(j);
 
-//                DebugPanel.getInstance().sendMessage("CRC", "Inspecting " + i + " bit of frame");
                 if (!isCorrupted(dataBytesBinaryCopy.toByteList(), currentFcsList)) {
-                    DebugPanel.getInstance().sendMessage("CRC", "Restored " + i + " bit of the frame");
+                    DebugPanel.getInstance().sendMessage("CRC", "Restored bit " + (i * 8 + j) + " of the frame");
                     DebugPanel.getInstance().sendMessage("CRC", "Restored data: " + dataBytesBinaryCopy + " with FCS " + currentFcs);
                     restoredData.addAll(dataBytesBinaryCopy.toByteList());
                     break;
                 }
             }
-            fcsIndex++;
         }
         return restoredData;
     }

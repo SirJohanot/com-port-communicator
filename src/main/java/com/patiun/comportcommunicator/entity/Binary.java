@@ -15,21 +15,16 @@ public class Binary {
     }
 
     public static Binary ofInt(int value) {
-        System.out.println("Binary operation: Calculating for " + value);
-        Binary resultBinary = new Binary(Integer.toBinaryString(value));
-        System.out.println("Binary Operation: Result: " + resultBinary);
-        return resultBinary;
+        return new Binary(Integer.toBinaryString(value));
     }
 
     public static Binary ofByte(byte value) {
-        System.out.println("Binary operation: Calculating for " + value);
         Binary result = ofInt(Byte.toUnsignedInt(value));
         if (result.length() < BYTE_SIZE) {
             int missingZerosNumber = BYTE_SIZE - result.length();
             String additionalZeros = "0".repeat(missingZerosNumber);
             result = new Binary(additionalZeros + result.bits);
         }
-        System.out.println("Binary Operation: Result: " + result);
         return result;
     }
 
@@ -52,7 +47,6 @@ public class Binary {
     }
 
     public List<Byte> toByteList() {
-        System.out.println("Binary Operation: Began conversion of " + bits.length() + " bits to bytes");
         List<Byte> result = new ArrayList<>();
         for (int i = length(); i >= 0; i -= BYTE_SIZE) {
             int subListBeginIndex = i - BYTE_SIZE;
@@ -61,7 +55,6 @@ public class Binary {
             }
             Binary byteBitsBinary = new Binary(substring(subListBeginIndex, i));
             Byte byteOfBinary = (byte) byteBitsBinary.toInt();
-            System.out.println("Binary Operation: Adding " + byteOfBinary + " to list");
             result.add(0, byteOfBinary);
             if (subListBeginIndex == 0) {
                 break;
@@ -71,7 +64,6 @@ public class Binary {
     }
 
     public Binary mod(Binary anotherBinary) {
-        System.out.println("Binary Operation: Mod " + this + " and " + anotherBinary);
         Binary copy = copy();
         while (true) {
             copy = copy.snipZeros();
@@ -89,23 +81,19 @@ public class Binary {
             Binary subtractionResult = copySubString.xor(anotherBinary);
             copy = new Binary(subtractionResult.bits + copy.substring(subStringEndIndex));
         }
-        System.out.println("Binary Operation: Calculated mod is " + copy);
         return copy;
     }
 
     public int compareSizes(Binary anotherBinary) {
-        System.out.println("Binary Operation: Comparing " + this + " to " + anotherBinary);
         int firstBinarySize = bits.length();
         int secondBinarySize = anotherBinary.length();
         if (firstBinarySize != secondBinarySize) {
-            System.out.println("Binary Operation: Unequal sizes");
             return firstBinarySize > secondBinarySize ? 1 : -1;
         }
         return 0;
     }
 
     public Binary xor(Binary anotherBinary) {
-        System.out.println("Binary Operation: Xor " + this + " and " + anotherBinary);
         int length = bits.length();
         StringBuilder resultBuilder = new StringBuilder();
         for (int i = 0; i < length; i++) {
@@ -114,7 +102,6 @@ public class Binary {
             resultBuilder.append((selfElement != anotherElement) ? "1" : "0");
         }
         String resultBits = resultBuilder.toString();
-        System.out.println("Binary Operation: Xor result: " + resultBits);
         return new Binary(resultBits);
     }
 

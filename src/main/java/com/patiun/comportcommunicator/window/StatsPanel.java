@@ -1,9 +1,7 @@
 package com.patiun.comportcommunicator.window;
 
-import com.patiun.comportcommunicator.bytestuffing.highlighter.COBSStuffedBytesHighlighter;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
 import com.patiun.comportcommunicator.highlighter.BytesHighlighter;
-import com.patiun.comportcommunicator.highlighter.FcsHighlighter;
 import com.patiun.comportcommunicator.util.ByteStringFormatter;
 
 import javax.swing.*;
@@ -31,29 +29,14 @@ public class StatsPanel extends JPanel {
         add(ComponentFactory.buildScrollPane(textArea), BorderLayout.CENTER);
     }
 
-    public void updateStuffedFrame(List<Byte> frameData, int stuffedBytesBeginningIndex, int stuffedBytesEndIndex, int fcsByteIndex) {
+    public void updateFrame(List<Byte> frameData, BytesHighlighter bytesHighlighter) {
         List<String> stringPresentation = ByteStringFormatter.byteListToStringList(frameData);
         String message = String.join(FRAME_BYTES_DELIMITER, stringPresentation);
         String currentText = textArea.getText();
         int currentLength = currentText.equals("") ? 0 : currentText.split(BYTES_DELIMITER_REGEX).length;
         textArea.append(message + "\n");
-        BytesHighlighter bytesHighlighter = new COBSStuffedBytesHighlighter(new FcsHighlighter(currentLength + fcsByteIndex), currentLength + stuffedBytesBeginningIndex, currentLength + stuffedBytesEndIndex);
         try {
-            bytesHighlighter.highlightBytes(textArea, BYTES_DELIMITER_REGEX, FRAME_BYTES_DELIMITER);
-        } catch (BadLocationException e) {
-            DebugPanel.getInstance().sendMessage("Stats", e.getMessage());
-        }
-    }
-
-    public void updateNonStuffedFrame(List<Byte> frameData, int fcsByteIndex) {
-        List<String> stringPresentation = ByteStringFormatter.byteListToStringList(frameData);
-        String message = String.join(FRAME_BYTES_DELIMITER, stringPresentation);
-        String currentText = textArea.getText();
-        int currentLength = currentText.equals("") ? 0 : currentText.split(BYTES_DELIMITER_REGEX).length;
-        textArea.append(message + "\n");
-        BytesHighlighter bytesHighlighter = new FcsHighlighter(currentLength + fcsByteIndex);
-        try {
-            bytesHighlighter.highlightBytes(textArea, BYTES_DELIMITER_REGEX, FRAME_BYTES_DELIMITER);
+            bytesHighlighter.highlightBytes(textArea, currentLength, BYTES_DELIMITER_REGEX, FRAME_BYTES_DELIMITER);
         } catch (BadLocationException e) {
             DebugPanel.getInstance().sendMessage("Stats", e.getMessage());
         }

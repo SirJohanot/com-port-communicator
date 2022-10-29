@@ -17,14 +17,14 @@ public abstract class AbstractChainedHighlighter implements BytesHighlighter {
     }
 
     @Override
-    public void highlightBytes(JTextArea textArea, String textAreaBytesDelimiterRegex, String frameBytesDelimiter) throws BadLocationException {
-        this.personalHighlightBytes(textArea, textAreaBytesDelimiterRegex, frameBytesDelimiter);
+    public void highlightBytes(JTextArea textArea, int oldLength, String textAreaBytesDelimiterRegex, String frameBytesDelimiter) throws BadLocationException {
+        this.personalHighlightBytes(textArea, oldLength, textAreaBytesDelimiterRegex, frameBytesDelimiter);
         if (successor != null) {
-            successor.highlightBytes(textArea, textAreaBytesDelimiterRegex, frameBytesDelimiter);
+            successor.highlightBytes(textArea, oldLength, textAreaBytesDelimiterRegex, frameBytesDelimiter);
         }
     }
 
-    protected abstract void personalHighlightBytes(JTextArea textArea, String textAreaBytesDelimiterRegex, String frameBytesDelimiter) throws BadLocationException;
+    protected abstract void personalHighlightBytes(JTextArea textArea, int oldLength, String textAreaBytesDelimiterRegex, String frameBytesDelimiter) throws BadLocationException;
 
     protected int charIndexOfByte(int byteIndex, List<String> byteList, String bytesDelimiter) {
         int delimiterLength = bytesDelimiter.length();
