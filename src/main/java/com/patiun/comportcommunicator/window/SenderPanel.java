@@ -12,10 +12,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class SenderPanel extends JPanel {
@@ -75,7 +73,7 @@ public class SenderPanel extends JPanel {
                 if (bufferedBytes.size() == Packet.DATA_BYTES_NUMBER) {
                     boolean stuffedFrame;
                     Packet packet;
-                    Byte fcs = 0;
+                    List<Byte> fcs = Collections.nCopies(Packet.FCS_SIZE, Byte.MIN_VALUE);
                     if (bufferedBytes.contains(Packet.FLAG_BYTE)) {
                         List<Byte> stuffedBytes = byteStuffer.stuffBytes(bufferedBytes);
                         packet = new Packet(getPortNumberByte(), stuffedBytes, fcs);
@@ -88,9 +86,9 @@ public class SenderPanel extends JPanel {
                     byte[] packetBytes = packet.toBytes();
                     List<Byte> packetBytesList = Arrays.asList(ArrayUtils.toObject(packetBytes));
                     if (stuffedFrame) {
-                        statsPanel.updateStuffedFrame(packetBytesList, 3, 3 + packet.getData().size(), packetBytesList.size() - 1);
+                        statsPanel.updateStuffedFrame(packetBytesList, 3, 3 + packet.getData().size(), packetBytesList.size() - Packet.FCS_SIZE);
                     } else {
-                        statsPanel.updateNonStuffedFrame(packetBytesList, packetBytesList.size() - 1);
+                        statsPanel.updateNonStuffedFrame(packetBytesList, packetBytesList.size() - Packet.FCS_SIZE);
                         List<Byte> randomlyCorruptedDataBytes = randomCorruption(bufferedBytes);
                         packet = new Packet(getPortNumberByte(), randomlyCorruptedDataBytes, fcs);
                         packetBytes = packet.toBytes();
@@ -121,13 +119,12 @@ public class SenderPanel extends JPanel {
     }
 
     private List<Byte> corruptRandomBit(List<Byte> dataBytes) {
-        Binary dataBinary = Binary.of(dataBytes);
-        int dataBitsNumber = dataBinary.size();
+        Binary dataBinary = Binary.ofBytes(dataBytes);
+        int dataBitsNumber = dataBinary.length();
         int randomBitNumber = (int) (Math.random() * dataBitsNumber);
-        Boolean randomBit = dataBinary.get(randomBitNumber);
-        dataBinary.set(randomBitNumber, !randomBit);
+        Binary withReversedBit = dataBinary.reverseBit(randomBitNumber);
         DebugPanel.getInstance().sendMessage("Sender", "Corruption of bit " + randomBitNumber + " occurred!");
-        return dataBinary.toByteList();
+        return withReversedBit.toByteList();
     }
 
 }

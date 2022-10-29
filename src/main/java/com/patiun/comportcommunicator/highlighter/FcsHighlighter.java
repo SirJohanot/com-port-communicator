@@ -1,5 +1,7 @@
 package com.patiun.comportcommunicator.highlighter;
 
+import com.patiun.comportcommunicator.entity.Packet;
+
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
@@ -9,15 +11,15 @@ import java.util.List;
 
 public class FcsHighlighter extends AbstractChainedHighlighter {
 
-    private final int fcsByteIndex;
+    private final int fcsByteBeginIndex;
 
-    public FcsHighlighter(int fcsByteIndex) {
-        this.fcsByteIndex = fcsByteIndex;
+    public FcsHighlighter(int fcsByteBeginIndex) {
+        this.fcsByteBeginIndex = fcsByteBeginIndex;
     }
 
-    public FcsHighlighter(BytesHighlighter successor, int fcsByteIndex) {
+    public FcsHighlighter(BytesHighlighter successor, int fcsByteBeginIndex) {
         super(successor);
-        this.fcsByteIndex = fcsByteIndex;
+        this.fcsByteBeginIndex = fcsByteBeginIndex;
     }
 
     @Override
@@ -25,8 +27,8 @@ public class FcsHighlighter extends AbstractChainedHighlighter {
         String text = textArea.getText();
         List<String> stringList = Arrays.asList(text.split(textAreaBytesDelimiterRegex));
         Highlighter highlighter = textArea.getHighlighter();
-        int byteStartIndex = charIndexOfByte(fcsByteIndex, stringList, frameBytesDelimiter);
-        int byteStringLength = stringList.get(fcsByteIndex).length();
-        highlighter.addHighlight(byteStartIndex, byteStartIndex + byteStringLength, HIGHLIGHT_PAINTER);
+        int byteStartIndex = charIndexOfByte(fcsByteBeginIndex, stringList, frameBytesDelimiter);
+        int byteEndIndex = charIndexOfByte(fcsByteBeginIndex + Packet.FCS_SIZE, stringList, frameBytesDelimiter);
+        highlighter.addHighlight(byteStartIndex, byteEndIndex, HIGHLIGHT_PAINTER);
     }
 }

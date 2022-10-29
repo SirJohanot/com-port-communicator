@@ -2,6 +2,7 @@ package com.patiun.comportcommunicator.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Packet {
 
@@ -10,26 +11,30 @@ public class Packet {
     public static final byte FLAG_BYTE = 'a' + DATA_BYTES_NUMBER;
 
     public static final int CONTROL_VALUE = 337; //2^8+2^6+2^4+2^0
-    public static final int FCS_SIZE = 8;
+    public static final int FCS_SIZE = 13;
 
     private final byte flag;
     private final byte destinationAddress;
     private final byte sourceAddress;
     private final List<Byte> data;
-    private final byte fcs;
+    private final List<Byte> fcs;
 
     public Packet(byte[] bytes) {
         this.flag = bytes[0];
         this.destinationAddress = bytes[1];
         this.sourceAddress = bytes[2];
         data = new ArrayList<>();
-        for (int i = 3; i < bytes.length - 1; i++) {
+        int i = 3;
+        for (; i < bytes.length - FCS_SIZE; i++) {
             data.add(bytes[i]);
         }
-        this.fcs = bytes[bytes.length - 1];
+        fcs = new ArrayList<>();
+        for (; i < bytes.length; i++) {
+            fcs.add(bytes[i]);
+        }
     }
 
-    public Packet(byte sourceAddress, List<Byte> data, Byte fcs) {
+    public Packet(byte sourceAddress, List<Byte> data, List<Byte> fcs) {
         this.flag = FLAG_BYTE;
         this.destinationAddress = 0;
         this.sourceAddress = sourceAddress;
@@ -53,12 +58,12 @@ public class Packet {
         return data;
     }
 
-    public byte getFcs() {
+    public List<Byte> getFcs() {
         return fcs;
     }
 
     public byte[] toBytes() {
-        byte[] bytes = new byte[data.size() + 4];
+        byte[] bytes = new byte[data.size() + FCS_SIZE + 3];
         bytes[0] = flag;
         bytes[1] = destinationAddress;
         bytes[2] = sourceAddress;
@@ -67,7 +72,10 @@ public class Packet {
             bytes[i] = datum;
             i++;
         }
-        bytes[i] = fcs;
+        for (byte datum : fcs) {
+            bytes[i] = datum;
+            i++;
+        }
         return bytes;
     }
 
@@ -91,10 +99,10 @@ public class Packet {
         if (sourceAddress != packet.sourceAddress) {
             return false;
         }
-        if (fcs != packet.fcs) {
+        if (!Objects.equals(data, packet.data)) {
             return false;
         }
-        return data.equals(packet.data);
+        return Objects.equals(fcs, packet.fcs);
     }
 
     @Override
@@ -102,8 +110,8 @@ public class Packet {
         int result = flag;
         result = 31 * result + (int) destinationAddress;
         result = 31 * result + (int) sourceAddress;
-        result = 31 * result + data.hashCode();
-        result = 31 * result + (int) fcs;
+        result = 31 * result + (data != null ? data.hashCode() : 0);
+        result = 31 * result + (fcs != null ? fcs.hashCode() : 0);
         return result;
     }
 

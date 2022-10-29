@@ -63,7 +63,7 @@ public class ReceiverPanel extends JPanel {
                     if (dataBytes.size() > Packet.DATA_BYTES_NUMBER) {
                         dataBytes = byteStuffer.restoreBytes(dataBytes);
                     } else {
-                        Byte fcs = receivedPacket.getFcs();
+                        List<Byte> fcs = receivedPacket.getFcs();
                         if (CrcEncoder.isCorrupted(dataBytes, fcs)) {
                             DebugPanel.getInstance().sendMessage("Receiver", "Corruption detected in the received frame!");
                             dataBytes = CrcEncoder.restoreData(dataBytes, fcs);

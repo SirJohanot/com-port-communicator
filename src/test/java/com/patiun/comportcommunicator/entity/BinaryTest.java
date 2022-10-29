@@ -8,9 +8,9 @@ public class BinaryTest {
     @Test
     public void testModShouldReturnTheCorrectMod() {
         //given
-        Binary firstBinary = Binary.of(2512);
-        Binary secondBinary = Binary.of(25);
-        Binary expectedMod = Binary.of(2);
+        Binary firstBinary = Binary.ofInt(2512);
+        Binary secondBinary = Binary.ofInt(25);
+        Binary expectedMod = Binary.ofInt(2);
         //when
         Binary actualMod = firstBinary.mod(secondBinary);
         //then
