@@ -1,0 +1,8 @@
+# Ignore IDE settings
+.idea
+
+# Ignore target
+target
+
+# Ignore dependency reduced pom
+dependency-reduced-pom.xml
