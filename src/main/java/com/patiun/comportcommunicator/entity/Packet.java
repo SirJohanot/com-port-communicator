@@ -10,8 +10,8 @@ public class Packet {
 
     public static final byte FLAG_BYTE = 'a' + DATA_BYTES_NUMBER;
 
-    public static final int CONTROL_VALUE = 337; //2^8+2^6+2^4+2^0
-    public static final int FCS_SIZE = 13;
+    public static final int CONTROL_VALUE = 98309; //2^16+2^15+2^2+1
+    public static final int FCS_SIZE = 2;
 
     private final byte flag;
     private final byte destinationAddress;
