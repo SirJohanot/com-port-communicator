@@ -21,7 +21,7 @@ public class StatsPanel extends JPanel {
         ComponentFactory.setUpPanel(this);
         setLayout(new BorderLayout());
 
-        add(ComponentFactory.buildLabel("Contents of the latest sent packet, hexadecimal (stuffed bytes are highlighted in red)"), BorderLayout.PAGE_START);
+        add(ComponentFactory.buildLabel("Sent packets frame data (stuffed bytes and fcs bytes highlighted in red)"), BorderLayout.PAGE_START);
 
         textArea = ComponentFactory.buildTextArea(false);
         textArea.setText("");

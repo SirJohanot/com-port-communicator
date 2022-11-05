@@ -114,14 +114,14 @@ public class SenderPanel extends JPanel {
     }
 
     private Packet formPacketAndUpdateFrame(List<Byte> dataBytes, List<Byte> fcsBytes, BytesHighlighter highlighter, ByteCorrupter corrupter) {
-        Packet packet = new Packet(getPortNumberByte(), dataBytes, fcsBytes);
+        List<Byte> randomlyCorruptedDataBytes = corrupter.corruptByte(dataBytes);
+        Packet packetToSend = new Packet(getPortNumberByte(), randomlyCorruptedDataBytes, fcsBytes);
 
-        byte[] packetBytes = packet.toBytes();
+        byte[] packetBytes = packetToSend.toBytes();
         List<Byte> packetBytesList = Arrays.asList(ArrayUtils.toObject(packetBytes));
         statsPanel.updateFrame(packetBytesList, highlighter);
-
-        List<Byte> randomlyCorruptedDataBytes = corrupter.corruptByte(dataBytes);
-        return new Packet(getPortNumberByte(), randomlyCorruptedDataBytes, fcsBytes);
+        
+        return packetToSend;
     }
 
     private byte getPortNumberByte() {
