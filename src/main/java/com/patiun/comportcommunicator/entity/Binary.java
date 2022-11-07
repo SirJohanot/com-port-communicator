@@ -15,27 +15,30 @@ public class Binary {
     }
 
     public static Binary ofInt(int value) {
-        return new Binary(Integer.toBinaryString(value));
+        String binaryPresentation = Integer.toBinaryString(value);
+        return new Binary(binaryPresentation);
     }
 
     public static Binary ofByte(byte value) {
-        Binary result = ofInt(Byte.toUnsignedInt(value));
+        int unsignedValue = Byte.toUnsignedInt(value);
+        Binary result = ofInt(unsignedValue);
         if (result.length() < BYTE_SIZE) {
             int missingZerosNumber = BYTE_SIZE - result.length();
             String additionalZeros = "0".repeat(missingZerosNumber);
-            result = new Binary(additionalZeros + result.bits);
+            String resultBits = result.bits;
+            result = new Binary(additionalZeros + resultBits);
         }
         return result;
     }
 
     public static Binary ofBytes(List<Byte> bytes) {
-        StringBuilder bits = new StringBuilder();
+        StringBuilder bitsBuilder = new StringBuilder();
         for (Byte b : bytes) {
             Binary byteBinary = ofByte(b);
-            String byteBits = byteBinary.bits;
-            bits.append(byteBits);
+            bitsBuilder.append(byteBinary.bits);
         }
-        return new Binary(bits.toString());
+        String bits = bitsBuilder.toString();
+        return new Binary(bits);
     }
 
     public String getBits() {
@@ -85,7 +88,7 @@ public class Binary {
     }
 
     public int compareSizes(Binary anotherBinary) {
-        int firstBinarySize = bits.length();
+        int firstBinarySize = length();
         int secondBinarySize = anotherBinary.length();
         if (firstBinarySize != secondBinarySize) {
             return firstBinarySize > secondBinarySize ? 1 : -1;
@@ -94,10 +97,9 @@ public class Binary {
     }
 
     public Binary xor(Binary anotherBinary) {
-        int length = bits.length();
         StringBuilder resultBuilder = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            char selfElement = bits.charAt(i);
+        for (int i = 0; i < length(); i++) {
+            char selfElement = charAt(i);
             char anotherElement = anotherBinary.charAt(i);
             resultBuilder.append((selfElement != anotherElement) ? "1" : "0");
         }
@@ -109,13 +111,14 @@ public class Binary {
         StringBuilder resultBitsBuilder = new StringBuilder(bits);
         char currentBitValue = resultBitsBuilder.charAt(index);
         resultBitsBuilder.setCharAt(index, (currentBitValue == '0') ? '1' : '0');
-        return new Binary(resultBitsBuilder.toString());
+        String resultBits = resultBitsBuilder.toString();
+        return new Binary(resultBits);
     }
 
     public Binary snipZeros() {
         int i = 0;
         for (; charAt(i) == '0' && i < length() - 1; i++) ;
-        return new Binary(bits.substring(i));
+        return new Binary(substring(i));
     }
 
     public Binary combine(Binary anotherBinary) {
@@ -130,15 +133,15 @@ public class Binary {
         return bits.length();
     }
 
-    public char charAt(int index) {
+    private char charAt(int index) {
         return bits.charAt(index);
     }
 
-    public String substring(int beginIndex) {
+    private String substring(int beginIndex) {
         return bits.substring(beginIndex);
     }
 
-    public String substring(int beginIndex, int endIndex) {
+    private String substring(int beginIndex, int endIndex) {
         return bits.substring(beginIndex, endIndex);
     }
 

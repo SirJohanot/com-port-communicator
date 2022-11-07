@@ -1,5 +1,6 @@
 # Ignore IDE settings
 .idea
+*.iml
 
 # Ignore target
 target
