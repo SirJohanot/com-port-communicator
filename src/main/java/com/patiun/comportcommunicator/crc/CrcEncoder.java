@@ -52,15 +52,13 @@ public class CrcEncoder {
         }
 
         Binary dataBytesBinary = Binary.ofBytes(frameDataBytes);
-        int dataBitsNumber = dataBytesBinary.length();
 
-        for (int i = 0; i < dataBitsNumber; i++) {
-            Binary dataBytesBinaryCopy = dataBytesBinary.copy();
-            dataBytesBinaryCopy = dataBytesBinaryCopy.reverseBit(i);
+        for (int i = 0; i < dataBytesBinary.length(); i++) {
+            Binary reversedBitCopy = dataBytesBinary.reverseBit(i);
 
-            if (!isCorrupted(dataBytesBinaryCopy.toByteList(), fcs)) {
+            if (!isCorrupted(reversedBitCopy.toByteList(), fcs)) {
                 DebugPanel.getInstance().sendMessage("CRC", "Restored bit " + i + " of the frame");
-                return dataBytesBinaryCopy.toByteList();
+                return reversedBitCopy.toByteList();
             }
         }
         return frameDataBytes;
