@@ -5,15 +5,15 @@ import com.patiun.comportcommunicator.window.DebugPanel;
 
 import java.util.List;
 
-import static com.patiun.comportcommunicator.entity.Packet.CONTROL_VALUE;
+import static com.patiun.comportcommunicator.entity.Packet.CRC_VALUE;
 import static com.patiun.comportcommunicator.entity.Packet.FCS_SIZE;
 
 public class CrcEncoder {
 
-    private static final Binary CONTROL_VALUE_BINARY = Binary.ofInt(CONTROL_VALUE);
+    private static final Binary CRC_VALUE_BINARY = Binary.ofInt(CRC_VALUE);
 
     static {
-        DebugPanel.getInstance().sendMessage("CRC", "Control value is " + CONTROL_VALUE_BINARY);
+        DebugPanel.getInstance().sendMessage("CRC operations", "CRC value is" + CRC_VALUE_BINARY);
     }
 
     public static List<Byte> calculateFcs(List<Byte> frameDataBytes) {
@@ -23,11 +23,11 @@ public class CrcEncoder {
             Binary additionalZerosBinary = Binary.ofByte((byte) 0);
             combinedDataBinary = combinedDataBinary.combine(additionalZerosBinary);
         }
-        DebugPanel.getInstance().sendMessage("CRC", "Calculating FCS for " + frameBinary);
-        Binary mod = combinedDataBinary.mod(CONTROL_VALUE_BINARY);
-        DebugPanel.getInstance().sendMessage("CRC", "Calculated fcs binary is " + mod);
+        DebugPanel.getInstance().sendMessage("CRC operations", "Calculating FCS for " + frameBinary);
+        Binary mod = combinedDataBinary.mod(CRC_VALUE_BINARY);
+        DebugPanel.getInstance().sendMessage("CRC operations", "Calculated fcs binary is " + mod);
         int modValue = mod.toInt();
-        DebugPanel.getInstance().sendMessage("CRC", "Calculated fcs is " + modValue);
+        DebugPanel.getInstance().sendMessage("CRC operations", "Calculated fcs is " + modValue);
         return mod.toByteList();
     }
 
@@ -37,10 +37,10 @@ public class CrcEncoder {
         Binary fcsBinary = Binary.ofBytes(fcs);
 
         Binary combinedDataBinary = frameDataBinary.combine(fcsBinary);
-        Binary mod = combinedDataBinary.mod(CONTROL_VALUE_BINARY);
+        Binary mod = combinedDataBinary.mod(CRC_VALUE_BINARY);
         int modValue = mod.toInt();
         if (modValue != 0) {
-            DebugPanel.getInstance().sendMessage("CRC", "Found corruption in binary " + frameDataBinary + ". Fcs is " + fcsBinary);
+            DebugPanel.getInstance().sendMessage("CRC operations", "Found corruption in binary " + frameDataBinary + ". Fcs is " + fcsBinary);
             return true;
         }
         return false;
@@ -57,7 +57,7 @@ public class CrcEncoder {
             Binary reversedBitCopy = dataBytesBinary.reverseBit(i);
 
             if (!isCorrupted(reversedBitCopy.toByteList(), fcs)) {
-                DebugPanel.getInstance().sendMessage("CRC", "Restored bit " + i + " of the frame");
+                DebugPanel.getInstance().sendMessage("CRC operations", "Restored bit " + i + " of the frame");
                 return reversedBitCopy.toByteList();
             }
         }
