@@ -27,7 +27,7 @@ public class SenderPanel extends JPanel {
     public static final byte JAM_SIGNAL = '$';
     private static final byte COLLISIONS_DELIMITER = ':';
     private static final byte COLLISION_CHARACTER = '*';
-    private static final int MAX_SENDING_TRIES = 5;
+    private static final int MAX_SENDING_ATTEMPTS = 5;
     private static final int CHANNEL_BUSY_CHANCE_PERCENTAGE = 50;
     private static final int COLLISION_CHANCE_PERCENTAGE = 50;
 
@@ -114,23 +114,22 @@ public class SenderPanel extends JPanel {
         byte[] packetBytes = packetToSend.toBytes();
 
         inputTextArea.setEditable(false);
-        waitUntilChannelIsFree();
-        int collisionTries = waitUntilNoCollision();
-        if (collisionTries == MAX_SENDING_TRIES) {
-            DebugPanel.getInstance().sendMessage("Sender", "Could not send the message because collisions could not be resolved after " + collisionTries + " tries");
-        } else {
-            List<Byte> bytesToDisplayOnStatusPanel = new ArrayList<>(Arrays.asList(ArrayUtils.toObject(packetBytes)));
-            if (collisionTries > 0) {
-                bytesToDisplayOnStatusPanel.add(COLLISIONS_DELIMITER);
-                IntStream.range(0, collisionTries)
-                        .forEach(t -> bytesToDisplayOnStatusPanel.add(COLLISION_CHARACTER));
-            }
-            statsPanel.updateFrame(bytesToDisplayOnStatusPanel, bytesHighlighter);
-
-            DebugPanel.getInstance().sendMessage("Sender", "Sending " + new String(packetBytes));
-            int bytesWritten = inputPort.writeBytes(packetBytes, packetBytes.length);
-            DebugPanel.getInstance().sendMessage(name.getText(), "Sent " + bytesWritten + " bytes");
+        int collisionTries = resolveCSMA();
+//        if (collisionTries == MAX_SENDING_TRIES) {
+//            DebugPanel.getInstance().sendMessage("Sender", "Could not send the message because collisions could not be resolved after " + collisionTries + " tries");
+//        } else {
+        List<Byte> bytesToDisplayOnStatusPanel = new ArrayList<>(Arrays.asList(ArrayUtils.toObject(packetBytes)));
+        if (collisionTries > 0) {
+            bytesToDisplayOnStatusPanel.add(COLLISIONS_DELIMITER);
+            IntStream.range(0, collisionTries)
+                    .forEach(t -> bytesToDisplayOnStatusPanel.add(COLLISION_CHARACTER));
         }
+        statsPanel.updateFrame(bytesToDisplayOnStatusPanel, bytesHighlighter);
+
+        DebugPanel.getInstance().sendMessage("Sender", "Sending " + new String(packetBytes));
+        int bytesWritten = inputPort.writeBytes(packetBytes, packetBytes.length);
+        DebugPanel.getInstance().sendMessage(name.getText(), "Sent " + bytesWritten + " bytes");
+//        }
         bufferedBytes.clear();
         inputTextArea.setEditable(true);
     }
@@ -138,6 +137,15 @@ public class SenderPanel extends JPanel {
     private Packet formPacket(List<Byte> dataBytes, List<Byte> fcsBytes, ByteCorrupter corrupter) {
         List<Byte> corruptedDataBytes = corrupter.corruptByte(dataBytes);
         return new Packet(getPortNumberByte(), corruptedDataBytes, fcsBytes);
+    }
+
+    private int resolveCSMA() {
+        int attempts = 0;
+        for (; attempts < MAX_SENDING_ATTEMPTS; attempts++) {
+            waitUntilChannelIsFree();
+            generateRandomCollisionAndSendJam(attempts + 1);
+        }
+        return attempts;
     }
 
     private void waitUntilChannelIsFree() {
@@ -151,22 +159,21 @@ public class SenderPanel extends JPanel {
         }
     }
 
-    private int waitUntilNoCollision() {
-        int tries = 0;
-        for (; randomPercentage() < COLLISION_CHANCE_PERCENTAGE && tries < MAX_SENDING_TRIES; tries++) {
+    private void generateRandomCollisionAndSendJam(int currentAttempt) {
+        if (randomPercentage() < COLLISION_CHANCE_PERCENTAGE) {
             DebugPanel.getInstance().sendMessage("Sender", "A collision has been detected, sending jam-signal and waiting for resolution");
             inputPort.writeBytes(new byte[]{JAM_SIGNAL}, 1);
-            waitForCollisionResolution(tries + 1);
+            waitForCollisionResolution(currentAttempt);
         }
-        return tries;
     }
 
     private int randomPercentage() {
         return new Random().nextInt(100);
     }
 
-    private void waitForCollisionResolution(int currentTry) {
-        int timeout = (int) Math.pow(3, currentTry);
+    private void waitForCollisionResolution(int currentAttempt) {
+        int maxTimeout = (int) Math.pow(3, currentAttempt);
+        int timeout = new Random().nextInt(maxTimeout);
         try {
             Thread.sleep(timeout);
         } catch (InterruptedException e) {
