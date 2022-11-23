@@ -24,20 +24,24 @@ import java.util.stream.IntStream;
 
 public class SenderPanel extends JPanel {
 
-    public static final char JAM_SIGNAL = '$';
-    private static int MAX_SENDING_TRIES = 5;
+    public static final byte JAM_SIGNAL = '$';
+    private static final byte COLLISIONS_DELIMITER = ':';
+    private static final byte COLLISION_CHARACTER = '*';
+    private static final int MAX_SENDING_TRIES = 5;
+    private static final int CHANNEL_BUSY_CHANCE_PERCENTAGE = 50;
+    private static final int COLLISION_CHANCE_PERCENTAGE = 50;
+
     private static final String ACCEPTED_CHARACTERS_REGEX = "[ -~]";
     private static final List<Character> forbiddenCharacters = Arrays.asList((char) KeyEvent.VK_BACK_SPACE, (char) KeyEvent.VK_DELETE);
+
+    private final JLabel name;
+    private JTextArea inputTextArea;
 
     private final List<Byte> bufferedBytes = new ArrayList<>();
     private final SerialPort inputPort;
 
-    private final ByteStuffer byteStuffer;
-
     private final StatsPanel statsPanel;
-
-    private final JLabel name;
-    private JTextArea inputTextArea;
+    private final ByteStuffer byteStuffer;
 
     public SenderPanel(SerialPort inputPort, ByteStuffer byteStuffer, StatsPanel statsPanel) throws HeadlessException {
         super();
@@ -117,9 +121,9 @@ public class SenderPanel extends JPanel {
         } else {
             List<Byte> bytesToDisplayOnStatusPanel = new ArrayList<>(Arrays.asList(ArrayUtils.toObject(packetBytes)));
             if (collisionTries > 0) {
-                bytesToDisplayOnStatusPanel.add((byte) ':');
+                bytesToDisplayOnStatusPanel.add(COLLISIONS_DELIMITER);
                 IntStream.range(0, collisionTries)
-                        .forEach(t -> bytesToDisplayOnStatusPanel.add((byte) '*'));
+                        .forEach(t -> bytesToDisplayOnStatusPanel.add(COLLISION_CHARACTER));
             }
             statsPanel.updateFrame(bytesToDisplayOnStatusPanel, bytesHighlighter);
 
@@ -132,15 +136,15 @@ public class SenderPanel extends JPanel {
     }
 
     private Packet formPacket(List<Byte> dataBytes, List<Byte> fcsBytes, ByteCorrupter corrupter) {
-        List<Byte> randomlyCorruptedDataBytes = corrupter.corruptByte(dataBytes);
-        return new Packet(getPortNumberByte(), randomlyCorruptedDataBytes, fcsBytes);
+        List<Byte> corruptedDataBytes = corrupter.corruptByte(dataBytes);
+        return new Packet(getPortNumberByte(), corruptedDataBytes, fcsBytes);
     }
 
     private void waitUntilChannelIsFree() {
-        while (new Random().nextBoolean()) {
+        while (randomPercentage() < CHANNEL_BUSY_CHANCE_PERCENTAGE) {
             DebugPanel.getInstance().sendMessage("Sender", "Cannot send the packet as the channel is busy, waiting");
             try {
-                Thread.sleep(10);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -149,13 +153,16 @@ public class SenderPanel extends JPanel {
 
     private int waitUntilNoCollision() {
         int tries = 0;
-        Random randomGenerator = new Random();
-        for (; randomGenerator.nextBoolean() && tries < MAX_SENDING_TRIES; tries++) {
+        for (; randomPercentage() < COLLISION_CHANCE_PERCENTAGE && tries < MAX_SENDING_TRIES; tries++) {
             DebugPanel.getInstance().sendMessage("Sender", "A collision has been detected, sending jam-signal and waiting for resolution");
-            inputPort.writeBytes(new byte[]{(byte) JAM_SIGNAL}, 1);
+            inputPort.writeBytes(new byte[]{JAM_SIGNAL}, 1);
             waitForCollisionResolution(tries + 1);
         }
         return tries;
+    }
+
+    private int randomPercentage() {
+        return new Random().nextInt(100);
     }
 
     private void waitForCollisionResolution(int currentTry) {

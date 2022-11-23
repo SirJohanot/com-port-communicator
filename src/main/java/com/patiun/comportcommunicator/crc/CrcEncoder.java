@@ -40,7 +40,7 @@ public class CrcEncoder {
         Binary mod = combinedDataBinary.mod(CRC_VALUE_BINARY);
         int modValue = mod.toInt();
         if (modValue != 0) {
-            DebugPanel.getInstance().sendMessage("CRC operations", "Found corruption in binary " + frameDataBinary + ". Fcs is " + fcsBinary);
+//            DebugPanel.getInstance().sendMessage("CRC operations", "Found corruption in binary " + frameDataBinary + ". Fcs is " + fcsBinary);
             return true;
         }
         return false;
