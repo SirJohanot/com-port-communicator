@@ -140,11 +140,13 @@ public class SenderPanel extends JPanel {
     }
 
     private int resolveCSMA() {
-        int attempts = 0;
-        for (; attempts < MAX_SENDING_ATTEMPTS; attempts++) {
+        int attempts = -1;
+        boolean collisionOccurred;
+        do {
+            attempts++;
             waitUntilChannelIsFree();
-            generateRandomCollisionAndSendJam(attempts + 1);
-        }
+            collisionOccurred = generateRandomCollisionAndSendJam(attempts + 1);
+        } while (attempts < MAX_SENDING_ATTEMPTS && collisionOccurred);
         return attempts;
     }
 
@@ -159,12 +161,14 @@ public class SenderPanel extends JPanel {
         }
     }
 
-    private void generateRandomCollisionAndSendJam(int currentAttempt) {
+    private boolean generateRandomCollisionAndSendJam(int currentAttempt) {
         if (randomPercentage() < COLLISION_CHANCE_PERCENTAGE) {
             DebugPanel.getInstance().sendMessage("Sender", "A collision has been detected, sending jam-signal and waiting for resolution");
             inputPort.writeBytes(new byte[]{JAM_SIGNAL}, 1);
             waitForCollisionResolution(currentAttempt);
+            return true;
         }
+        return false;
     }
 
     private int randomPercentage() {
