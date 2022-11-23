@@ -5,11 +5,11 @@ import com.patiun.comportcommunicator.bytecorrputer.ByteCorrupter;
 import com.patiun.comportcommunicator.bytecorrputer.FiftyPercentByteCorrupter;
 import com.patiun.comportcommunicator.bytecorrputer.NoCorruptionByteCorrupter;
 import com.patiun.comportcommunicator.bytestuffing.ByteStuffer;
-import com.patiun.comportcommunicator.bytestuffing.highlighter.COBSStuffedBytesHighlighter;
 import com.patiun.comportcommunicator.crc.CrcEncoder;
 import com.patiun.comportcommunicator.entity.Packet;
 import com.patiun.comportcommunicator.factory.ComponentFactory;
 import com.patiun.comportcommunicator.highlighter.BytesHighlighter;
+import com.patiun.comportcommunicator.highlighter.COBSStuffedBytesHighlighter;
 import com.patiun.comportcommunicator.highlighter.FcsHighlighter;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -17,14 +17,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 public class SenderPanel extends JPanel {
 
+    public static final char JAM_SIGNAL = '$';
+    private static int MAX_SENDING_TRIES = 5;
     private static final String ACCEPTED_CHARACTERS_REGEX = "[ -~]";
     private static final List<Character> forbiddenCharacters = Arrays.asList((char) KeyEvent.VK_BACK_SPACE, (char) KeyEvent.VK_DELETE);
 
@@ -36,6 +37,7 @@ public class SenderPanel extends JPanel {
     private final StatsPanel statsPanel;
 
     private final JLabel name;
+    private JTextArea inputTextArea;
 
     public SenderPanel(SerialPort inputPort, ByteStuffer byteStuffer, StatsPanel statsPanel) throws HeadlessException {
         super();
@@ -56,7 +58,7 @@ public class SenderPanel extends JPanel {
     }
 
     private JScrollPane setUpInput() {
-        JTextArea inputTextArea = ComponentFactory.buildTextArea(true);
+        inputTextArea = ComponentFactory.buildTextArea(true);
         inputTextArea.getInputMap().put(KeyStroke.getKeyStroke("control V"), "none");
         inputTextArea.getInputMap().put(KeyStroke.getKeyStroke("control Z"), "none");
         inputTextArea.getInputMap().put(KeyStroke.getKeyStroke("control X"), "none");
@@ -104,24 +106,65 @@ public class SenderPanel extends JPanel {
             byteCorrupter = new FiftyPercentByteCorrupter();
         }
 
-        Packet packetToSend = formPacketAndUpdateFrame(dataBytes, fcs, bytesHighlighter, byteCorrupter);
+        Packet packetToSend = formPacket(dataBytes, fcs, byteCorrupter);
         byte[] packetBytes = packetToSend.toBytes();
-        DebugPanel.getInstance().sendMessage("Sender", "Sending " + new String(packetBytes));
 
-        int bytesWritten = inputPort.writeBytes(packetBytes, packetBytes.length);
-        DebugPanel.getInstance().sendMessage(name.getText(), "Sent " + bytesWritten + " bytes");
+        inputTextArea.setEditable(false);
+        waitUntilChannelIsFree();
+        int collisionTries = waitUntilNoCollision();
+        if (collisionTries == MAX_SENDING_TRIES) {
+            DebugPanel.getInstance().sendMessage("Sender", "Could not send the message because collisions could not be resolved after " + collisionTries + " tries");
+        } else {
+            List<Byte> bytesToDisplayOnStatusPanel = new ArrayList<>(Arrays.asList(ArrayUtils.toObject(packetBytes)));
+            if (collisionTries > 0) {
+                bytesToDisplayOnStatusPanel.add((byte) ':');
+                IntStream.range(0, collisionTries)
+                        .forEach(t -> bytesToDisplayOnStatusPanel.add((byte) '*'));
+            }
+            statsPanel.updateFrame(bytesToDisplayOnStatusPanel, bytesHighlighter);
+
+            DebugPanel.getInstance().sendMessage("Sender", "Sending " + new String(packetBytes));
+            int bytesWritten = inputPort.writeBytes(packetBytes, packetBytes.length);
+            DebugPanel.getInstance().sendMessage(name.getText(), "Sent " + bytesWritten + " bytes");
+        }
         bufferedBytes.clear();
+        inputTextArea.setEditable(true);
     }
 
-    private Packet formPacketAndUpdateFrame(List<Byte> dataBytes, List<Byte> fcsBytes, BytesHighlighter highlighter, ByteCorrupter corrupter) {
+    private Packet formPacket(List<Byte> dataBytes, List<Byte> fcsBytes, ByteCorrupter corrupter) {
         List<Byte> randomlyCorruptedDataBytes = corrupter.corruptByte(dataBytes);
-        Packet packetToSend = new Packet(getPortNumberByte(), randomlyCorruptedDataBytes, fcsBytes);
+        return new Packet(getPortNumberByte(), randomlyCorruptedDataBytes, fcsBytes);
+    }
 
-        byte[] packetBytes = packetToSend.toBytes();
-        List<Byte> packetBytesList = Arrays.asList(ArrayUtils.toObject(packetBytes));
-        statsPanel.updateFrame(packetBytesList, highlighter);
-        
-        return packetToSend;
+    private void waitUntilChannelIsFree() {
+        while (new Random().nextBoolean()) {
+            DebugPanel.getInstance().sendMessage("Sender", "Cannot send the packet as the channel is busy, waiting");
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private int waitUntilNoCollision() {
+        int tries = 0;
+        Random randomGenerator = new Random();
+        for (; randomGenerator.nextBoolean() && tries < MAX_SENDING_TRIES; tries++) {
+            DebugPanel.getInstance().sendMessage("Sender", "A collision has been detected, sending jam-signal and waiting for resolution");
+            inputPort.writeBytes(new byte[]{(byte) JAM_SIGNAL}, 1);
+            waitForCollisionResolution(tries + 1);
+        }
+        return tries;
+    }
+
+    private void waitForCollisionResolution(int currentTry) {
+        int timeout = (int) Math.pow(3, currentTry);
+        try {
+            Thread.sleep(timeout);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private byte getPortNumberByte() {

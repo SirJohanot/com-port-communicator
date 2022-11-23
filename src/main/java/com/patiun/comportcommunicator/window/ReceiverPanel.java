@@ -58,6 +58,12 @@ public class ReceiverPanel extends JPanel {
                     byte[] bytes = new byte[bytesAvailable];
                     int bytesRead = outputPort.readBytes(bytes, bytesAvailable);
                     DebugPanel.getInstance().sendMessage(name.getText(), "Read message '" + new String(bytes) + "' as " + bytesRead + " bytes");
+
+                    if (bytes[0] == SenderPanel.JAM_SIGNAL) {
+                        DebugPanel.getInstance().sendMessage(name.getText(), "Received jam-signal from sender!");
+                        return;
+                    }
+
                     Packet receivedPacket = new Packet(bytes);
                     List<Byte> dataBytes = receivedPacket.getData();
                     if (dataBytes.size() > Packet.DATA_BYTES_NUMBER) {

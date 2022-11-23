@@ -1,7 +1,5 @@
-package com.patiun.comportcommunicator.bytestuffing.highlighter;
+package com.patiun.comportcommunicator.highlighter;
 
-import com.patiun.comportcommunicator.highlighter.AbstractChainedHighlighter;
-import com.patiun.comportcommunicator.highlighter.BytesHighlighter;
 import com.patiun.comportcommunicator.util.ByteStringFormatter;
 
 import javax.swing.*;
