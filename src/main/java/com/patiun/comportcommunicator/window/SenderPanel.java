@@ -115,21 +115,21 @@ public class SenderPanel extends JPanel {
 
         inputTextArea.setEditable(false);
         int collisionTries = resolveCSMA();
-//        if (collisionTries == MAX_SENDING_TRIES) {
-//            DebugPanel.getInstance().sendMessage("Sender", "Could not send the message because collisions could not be resolved after " + collisionTries + " tries");
-//        } else {
-        List<Byte> bytesToDisplayOnStatusPanel = new ArrayList<>(Arrays.asList(ArrayUtils.toObject(packetBytes)));
-        if (collisionTries > 0) {
-            bytesToDisplayOnStatusPanel.add(COLLISIONS_DELIMITER);
-            IntStream.range(0, collisionTries)
-                    .forEach(t -> bytesToDisplayOnStatusPanel.add(COLLISION_CHARACTER));
-        }
-        statsPanel.updateFrame(bytesToDisplayOnStatusPanel, bytesHighlighter);
+        if (collisionTries == MAX_SENDING_ATTEMPTS) {
+            DebugPanel.getInstance().sendMessage("Sender", "Could not send the message because collisions could not be resolved after " + collisionTries + " tries");
+        } else {
+            List<Byte> bytesToDisplayOnStatusPanel = new ArrayList<>(Arrays.asList(ArrayUtils.toObject(packetBytes)));
+            if (collisionTries > 1) {
+                bytesToDisplayOnStatusPanel.add(COLLISIONS_DELIMITER);
+                IntStream.range(1, collisionTries)
+                        .forEach(t -> bytesToDisplayOnStatusPanel.add(COLLISION_CHARACTER));
+            }
+            statsPanel.updateFrame(bytesToDisplayOnStatusPanel, bytesHighlighter);
 
-        DebugPanel.getInstance().sendMessage("Sender", "Sending " + new String(packetBytes));
-        int bytesWritten = inputPort.writeBytes(packetBytes, packetBytes.length);
-        DebugPanel.getInstance().sendMessage(name.getText(), "Sent " + bytesWritten + " bytes");
-//        }
+            DebugPanel.getInstance().sendMessage("Sender", "Sending " + new String(packetBytes));
+            int bytesWritten = inputPort.writeBytes(packetBytes, packetBytes.length);
+            DebugPanel.getInstance().sendMessage(name.getText(), "Sent " + bytesWritten + " bytes");
+        }
         bufferedBytes.clear();
         inputTextArea.setEditable(true);
     }
@@ -140,13 +140,14 @@ public class SenderPanel extends JPanel {
     }
 
     private int resolveCSMA() {
-        int attempts = -1;
-        boolean collisionOccurred;
-        do {
-            attempts++;
+        int attempts = 1;
+        while (attempts <= MAX_SENDING_ATTEMPTS) {
             waitUntilChannelIsFree();
-            collisionOccurred = generateRandomCollisionAndSendJam(attempts + 1);
-        } while (attempts < MAX_SENDING_ATTEMPTS && collisionOccurred);
+            if (!generateRandomCollisionAndSendJam(attempts)) {
+                break;
+            }
+            attempts++;
+        }
         return attempts;
     }
 
