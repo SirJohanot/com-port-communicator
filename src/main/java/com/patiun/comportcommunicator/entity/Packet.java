@@ -10,7 +10,7 @@ public class Packet {
 
     public static final byte FLAG_BYTE = 'a' + DATA_BYTES_NUMBER;
 
-    public static final int CRC_VALUE = 997;
+    public static final int CRC_VALUE = 98309;
     public static final int FCS_SIZE = 2;
 
     private final byte flag;
